@@ -4,8 +4,7 @@ import type { Product, ProductFilters, CreateProductDto, UpdateProductDto } from
 import { ProductCard } from "./ProductCard";
 import { ProductFiltersComponent } from "./ProductFilters";
 import { ProductForm } from "./ProductForm";
-import { Pagination } from "./Pagination";
-import { Modal, ConfirmDialog, Loading, ErrorMessage, IconPlus, IconProducts } from "../ui";
+import { Modal, ConfirmDialog, Loading, ErrorMessage, IconPlus, IconProducts, Pagination } from "../ui";
 
 export function ProductList() {
 	const {
@@ -179,7 +178,7 @@ export function ProductList() {
 			)}
 
 			{/* Paginação */}
-			{pagination && <Pagination pagination={pagination} onPageChange={handlePageChange} />}
+			{pagination && <Pagination meta={pagination} onPageChange={handlePageChange} />}
 
 			{/* Modal de formulário */}
 			<Modal

@@ -72,8 +72,8 @@ export function ProductCard({ product, onEdit, onToggleActive, onTogglePublic, o
 						<IconEdit size={16} />
 						Editar
 					</button>
-					<button 
-						onClick={() => onTogglePublic(product.id)} 
+					<button
+						onClick={() => onTogglePublic(product.id)}
 						className="btn btn-ghost btn-sm"
 						title={product.isPublic ? "Tornar privado" : "Tornar público"}
 					>
