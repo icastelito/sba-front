@@ -922,6 +922,7 @@ p {
 	background: var(--bg-secondary);
 	border: 1px solid var(--border-light);
 	border-radius: var(--radius-lg);
+	width: 100%;
 }
 
 .filters-search {
@@ -937,11 +938,12 @@ p {
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--space-4);
+	width: 100%;
 }
 
 .filters-fieldset {
-	flex: 1;
-	min-width: 250px;
+	flex: 1 1 0;
+	min-width: 200px;
 	padding: var(--space-3);
 	border: 1px solid var(--border-light);
 	border-radius: var(--radius-md);
