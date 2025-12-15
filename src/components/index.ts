@@ -3,3 +3,5 @@ export * from "./todos";
 export * from "./templates";
 export * from "./products";
 export * from "./requesters";
+export * from "./clients";
+export * from "./salesOrders";

@@ -87,5 +87,7 @@ class ApiClient {
 	}
 }
 
+// API com prefixo /api
 export const api = new ApiClient(API_BASE_URL);
+
 export { API_BASE_URL };

@@ -227,3 +227,171 @@ export interface Requester {
 	createdAt: string;
 	updatedAt: string;
 }
+
+// ==================== CLIENT ====================
+
+export interface Client {
+	id: string;
+	name: string;
+	email?: string;
+	phone?: string;
+	document?: string;
+	address?: string;
+	city?: string;
+	state?: string;
+	zipCode?: string;
+	notes?: string;
+	isActive: boolean;
+	ordersCount?: number;
+	recentOrders?: SalesOrderSummary[];
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface CreateClientDto {
+	name: string;
+	email?: string;
+	phone?: string;
+	document?: string;
+	address?: string;
+	city?: string;
+	state?: string;
+	zipCode?: string;
+	notes?: string;
+	isActive?: boolean;
+}
+
+export interface UpdateClientDto {
+	name?: string;
+	email?: string;
+	phone?: string;
+	document?: string;
+	address?: string;
+	city?: string;
+	state?: string;
+	zipCode?: string;
+	notes?: string;
+	isActive?: boolean;
+}
+
+export interface ClientFilters {
+	search?: string;
+	city?: string;
+	state?: string;
+	isActive?: boolean;
+	page?: number;
+	limit?: number;
+	sortBy?: "name" | "email" | "createdAt" | "updatedAt";
+	sortOrder?: SortOrder;
+}
+
+// ==================== SALES ORDER ====================
+
+export const OrderStatus = {
+	PENDING: "PENDING",
+	CONFIRMED: "CONFIRMED",
+	PAID: "PAID",
+	PROCESSING: "PROCESSING",
+	SHIPPED: "SHIPPED",
+	DELIVERED: "DELIVERED",
+	CANCELED: "CANCELED",
+	REFUNDED: "REFUNDED",
+} as const;
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+
+export interface SalesOrderItem {
+	id: string;
+	productId: string;
+	productName: string;
+	productSku?: string;
+	quantity: number;
+	unitPrice: number;
+	discount: number;
+	total: number;
+	product?: {
+		id: string;
+		name: string;
+		image?: string;
+		imageType?: string;
+	};
+}
+
+export interface SalesOrderSummary {
+	id: string;
+	orderNumber: number;
+	status: OrderStatus;
+	total: number;
+	createdAt: string;
+}
+
+export interface SalesOrder {
+	id: string;
+	orderNumber: number;
+	status: OrderStatus;
+	subtotal: number;
+	discount: number;
+	shipping: number;
+	total: number;
+	notes?: string;
+	paymentMethod?: string;
+	shipByDate?: string;
+	paidAt?: string;
+	shippedAt?: string;
+	deliveredAt?: string;
+	canceledAt?: string;
+	client: Client;
+	items: SalesOrderItem[];
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface CreateSalesOrderItemDto {
+	productId: string;
+	quantity: number;
+	unitPrice?: number;
+	discount?: number;
+}
+
+export interface CreateSalesOrderDto {
+	clientId: string;
+	items: CreateSalesOrderItemDto[];
+	discount?: number;
+	shipping?: number;
+	notes?: string;
+	paymentMethod?: string;
+	shipByDate?: string;
+}
+
+export interface UpdateSalesOrderDto {
+	discount?: number;
+	shipping?: number;
+	notes?: string;
+	paymentMethod?: string;
+	shipByDate?: string;
+	items?: CreateSalesOrderItemDto[];
+}
+
+export interface SalesOrderFilters {
+	search?: string;
+	clientId?: string;
+	status?: OrderStatus;
+	dateFrom?: string;
+	dateTo?: string;
+	shipByDateFrom?: string;
+	shipByDateTo?: string;
+	totalMin?: number;
+	totalMax?: number;
+	page?: number;
+	limit?: number;
+	sortBy?: "orderNumber" | "total" | "status" | "createdAt" | "updatedAt" | "shipByDate";
+	sortOrder?: SortOrder;
+}
+
+export interface SalesOrderStats {
+	totalOrders: number;
+	pendingOrders: number;
+	paidOrders: number;
+	canceledOrders: number;
+	totalRevenue: number;
+	todayOrders: number;
+}
