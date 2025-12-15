@@ -11,7 +11,6 @@ import {
 	IconCash,
 	IconCog,
 	IconTruck,
-	IconPackage,
 	IconXCircle,
 	IconArrowUturnLeft,
 	IconHomeCheck,

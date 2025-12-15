@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Client, CreateClientDto, UpdateClientDto } from "../../types";
-import { IconCheck, IconClose, IconSearch } from "../ui";
+import { IconCheck, IconClose } from "../ui";
 
 interface ClientFormProps {
 	client?: Client | null;
