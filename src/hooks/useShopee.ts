@@ -65,8 +65,8 @@ export function useShopee(): UseShopeeReturn {
 		try {
 			const response = await shopeeApi.connect();
 			if (response.success && response.data.authUrl) {
-				// Abrir em nova aba para OAuth
-				window.open(response.data.authUrl, "shopee_auth", "width=800,height=600");
+				// Redireciona na mesma janela para OAuth (mais confiável)
+				window.location.href = response.data.authUrl;
 			}
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Erro ao conectar loja");

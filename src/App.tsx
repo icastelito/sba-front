@@ -27,12 +27,16 @@ function App() {
 						<Route path="/register" element={<RegisterPage />} />
 					</Route>
 
+					{/* Callback da Shopee - fora do Layout para evitar problemas */}
+					<Route element={<ProtectedRoute />}>
+						<Route path="/shopee/callback" element={<ShopeeCallbackPage />} />
+					</Route>
+
 					{/* Rotas protegidas (só acessa se estiver logado) */}
 					<Route element={<ProtectedRoute />}>
 						<Route path="/" element={<Layout />}>
 							<Route index element={<Navigate to="/shopee" replace />} />
 							<Route path="shopee" element={<ShopeePage />} />
-							<Route path="shopee/callback" element={<ShopeeCallbackPage />} />
 							<Route path="tarefas" element={<TodosPage />} />
 							<Route path="templates" element={<TemplatesPage />} />
 							<Route path="demandantes" element={<RequestersPage />} />

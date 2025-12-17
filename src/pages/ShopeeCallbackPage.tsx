@@ -9,25 +9,31 @@ export function ShopeeCallbackPage() {
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const [status, setStatus] = useState<CallbackStatus>("loading");
+	const [message, setMessage] = useState("");
 
+	// Parâmetros de sucesso
 	const success = searchParams.get("success") === "true";
 	const shopId = searchParams.get("shop_id");
 	const shopName = searchParams.get("shop_name");
+
+	// Parâmetros de erro
 	const errorCode = searchParams.get("error");
 	const errorMessage = searchParams.get("message");
 
 	useEffect(() => {
 		if (success) {
 			setStatus("success");
+			setMessage(`Loja "${shopName || shopId}" conectada com sucesso!`);
+
 			// Redirecionar após 3 segundos
-			const timer = setTimeout(() => {
+			setTimeout(() => {
 				navigate("/shopee");
 			}, 3000);
-			return () => clearTimeout(timer);
 		} else {
 			setStatus("error");
+			setMessage(errorMessage || errorCode || "Erro desconhecido ao conectar loja");
 		}
-	}, [success, navigate]);
+	}, [success, shopId, shopName, errorCode, errorMessage, navigate]);
 
 	const handleGoBack = () => {
 		navigate("/shopee");
@@ -79,9 +85,7 @@ export function ShopeeCallbackPage() {
 					<IconError size={48} />
 				</div>
 				<h1>Erro na Conexão</h1>
-				<p className="callback-error-message">
-					{errorMessage || "Ocorreu um erro ao conectar sua loja Shopee."}
-				</p>
+				<p className="callback-error-message">{message}</p>
 				{errorCode && (
 					<p className="callback-error-code">
 						Código do erro: <code>{errorCode}</code>
