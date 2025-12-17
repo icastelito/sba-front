@@ -5,3 +5,4 @@ export * from "./products";
 export * from "./requesters";
 export * from "./clients";
 export * from "./salesOrders";
+export { ProtectedRoute, PublicRoute } from "./ProtectedRoute";

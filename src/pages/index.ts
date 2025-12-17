@@ -4,3 +4,8 @@ export { ProductsPage } from "./ProductsPage";
 export { RequestersPage } from "./RequestersPage";
 export { ClientsPage } from "./ClientsPage";
 export { SalesOrdersPage } from "./SalesOrdersPage";
+export { LoginPage } from "./LoginPage";
+export { RegisterPage } from "./RegisterPage";
+export { ProfilePage } from "./ProfilePage";
+export { ShopeePage } from "./ShopeePage";
+export { ShopeeCallbackPage } from "./ShopeeCallbackPage";

@@ -1,3 +1,125 @@
+// ==================== AUTH ====================
+
+export interface User {
+	id: string;
+	email: string;
+	username: string;
+	name: string;
+	nickname: string | null;
+	isActive: boolean;
+	emailVerified: boolean;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface TokenResponse {
+	accessToken: string;
+	refreshToken: string;
+	expiresIn: number;
+	tokenType: "Bearer";
+}
+
+export interface RegisterDto {
+	email: string;
+	username: string;
+	name: string;
+	nickname?: string;
+	password: string;
+}
+
+export interface LoginDto {
+	login: string;
+	password: string;
+}
+
+export interface UpdateProfileDto {
+	name?: string;
+	nickname?: string;
+	username?: string;
+}
+
+export interface ChangePasswordDto {
+	currentPassword: string;
+	newPassword: string;
+}
+
+export interface AuthState {
+	user: User | null;
+	accessToken: string | null;
+	refreshToken: string | null;
+	isAuthenticated: boolean;
+	isLoading: boolean;
+}
+
+// ==================== SHOPEE ====================
+
+export const ShopeeStoreStatus = {
+	ACTIVE: "ACTIVE",
+	TOKEN_EXPIRED: "TOKEN_EXPIRED",
+	DISCONNECTED: "DISCONNECTED",
+	ERROR: "ERROR",
+} as const;
+export type ShopeeStoreStatus = (typeof ShopeeStoreStatus)[keyof typeof ShopeeStoreStatus];
+
+export interface ShopeeStore {
+	id: string;
+	shopId: string;
+	shopName: string | null;
+	region: string;
+	status: ShopeeStoreStatus;
+	tokenExpiresAt: string;
+	lastSyncAt: string | null;
+	errorMessage: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface ShopeeConnectResponse {
+	success: boolean;
+	message: string;
+	data: {
+		authUrl: string;
+		instructions: string;
+	};
+}
+
+export interface ShopeeStoresResponse {
+	success: boolean;
+	data: ShopeeStore[];
+	meta: {
+		total: number;
+	};
+}
+
+export interface ShopeeConnectedResponse {
+	success: boolean;
+	connected: boolean;
+	data: {
+		totalStores: number;
+		activeStores: number;
+		stores: {
+			shopId: string;
+			shopName: string | null;
+			status: ShopeeStoreStatus;
+			isActive: boolean;
+		}[];
+	};
+}
+
+export interface ShopeeStoreStatusResponse {
+	success: boolean;
+	connected: boolean;
+	data: {
+		status: ShopeeStoreStatus;
+		isActive: boolean;
+		isExpired: boolean;
+		tokenExpiresAt: string;
+		shopName: string | null;
+		lastSyncAt: string | null;
+		errorMessage: string | null;
+	};
+}
+
 // ==================== ENUMS ====================
 
 export const TaskStatus = {

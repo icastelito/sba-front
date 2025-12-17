@@ -1,22 +1,52 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
-import { TodosPage, TemplatesPage, ProductsPage, RequestersPage, ClientsPage, SalesOrdersPage } from "./pages";
+import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
+import { AuthProvider } from "./hooks/useAuth";
+import {
+	TodosPage,
+	TemplatesPage,
+	ProductsPage,
+	RequestersPage,
+	ClientsPage,
+	SalesOrdersPage,
+	LoginPage,
+	RegisterPage,
+	ProfilePage,
+	ShopeePage,
+	ShopeeCallbackPage,
+} from "./pages";
 
 function App() {
 	return (
 		<BrowserRouter>
-			<Routes>
-				<Route path="/" element={<Layout />}>
-					<Route index element={<Navigate to="/tarefas" replace />} />
-					<Route path="tarefas" element={<TodosPage />} />
-					<Route path="templates" element={<TemplatesPage />} />
-					<Route path="demandantes" element={<RequestersPage />} />
-					<Route path="produtos" element={<ProductsPage />} />
-					<Route path="clientes" element={<ClientsPage />} />
-					<Route path="pedidos" element={<SalesOrdersPage />} />
-					<Route path="*" element={<Navigate to="/tarefas" replace />} />
-				</Route>
-			</Routes>
+			<AuthProvider>
+				<Routes>
+					{/* Rotas públicas (só acessa se NÃO estiver logado) */}
+					<Route element={<PublicRoute />}>
+						<Route path="/login" element={<LoginPage />} />
+						<Route path="/register" element={<RegisterPage />} />
+					</Route>
+
+					{/* Rotas protegidas (só acessa se estiver logado) */}
+					<Route element={<ProtectedRoute />}>
+						<Route path="/" element={<Layout />}>
+							<Route index element={<Navigate to="/shopee" replace />} />
+							<Route path="shopee" element={<ShopeePage />} />
+							<Route path="shopee/callback" element={<ShopeeCallbackPage />} />
+							<Route path="tarefas" element={<TodosPage />} />
+							<Route path="templates" element={<TemplatesPage />} />
+							<Route path="demandantes" element={<RequestersPage />} />
+							<Route path="produtos" element={<ProductsPage />} />
+							<Route path="clientes" element={<ClientsPage />} />
+							<Route path="pedidos" element={<SalesOrdersPage />} />
+							<Route path="perfil" element={<ProfilePage />} />
+						</Route>
+					</Route>
+
+					{/* Rota padrão - redireciona para login se não logado */}
+					<Route path="*" element={<Navigate to="/login" replace />} />
+				</Routes>
+			</AuthProvider>
 		</BrowserRouter>
 	);
 }

@@ -1,6 +1,16 @@
 import { Outlet, NavLink } from "react-router-dom";
 import type { ReactNode } from "react";
-import { IconTasks, IconTemplate, IconProducts, IconUsers, IconClients, IconShoppingCart } from "./ui";
+import {
+	IconTasks,
+	IconTemplate,
+	IconProducts,
+	IconUsers,
+	IconClients,
+	IconShoppingCart,
+	IconUser,
+	IconShopee,
+} from "./ui";
+import { useAuth } from "../hooks/useAuth";
 
 interface NavItem {
 	to: string;
@@ -9,6 +19,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+	{ to: "/shopee", label: "Shopee", icon: <IconShopee size={18} /> },
 	{ to: "/tarefas", label: "Tarefas", icon: <IconTasks size={18} /> },
 	{ to: "/templates", label: "Templates", icon: <IconTemplate size={18} /> },
 	{ to: "/demandantes", label: "Demandantes", icon: <IconUsers size={18} /> },
@@ -18,6 +29,8 @@ const navItems: NavItem[] = [
 ];
 
 export function Layout() {
+	const { user } = useAuth();
+
 	return (
 		<div className="app-container">
 			<nav className="app-nav">
@@ -36,6 +49,15 @@ export function Layout() {
 								<span>{item.label}</span>
 							</NavLink>
 						))}
+					</div>
+					<div className="app-user">
+						<NavLink
+							to="/perfil"
+							className={({ isActive }) => `app-user-link ${isActive ? "app-user-link-active" : ""}`}
+						>
+							<IconUser size={18} />
+							<span>{user?.nickname || user?.name?.split(" ")[0] || "Perfil"}</span>
+						</NavLink>
 					</div>
 				</div>
 			</nav>

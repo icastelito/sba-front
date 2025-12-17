@@ -592,3 +592,24 @@ export function IconMapPin({ size = 24, ...props }: IconProps) {
 		</svg>
 	);
 }
+
+export function IconShopee({ size = 24, ...props }: IconProps) {
+	return (
+		<svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" {...props}>
+			<path d="M12 2C9.243 2 7 4.243 7 7h2c0-1.654 1.346-3 3-3s3 1.346 3 3h2c0-2.757-2.243-5-5-5z" />
+			<path d="M18 7H6c-1.103 0-2 .897-2 2v11c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2V9c0-1.103-.897-2-2-2zm-6 10c-2.757 0-5-2.243-5-5h2c0 1.654 1.346 3 3 3s3-1.346 3-3h2c0 2.757-2.243 5-5 5z" />
+		</svg>
+	);
+}
+
+export function IconError({ size = 24, ...props }: IconProps) {
+	return (
+		<svg {...defaultProps} width={size} height={size} {...props}>
+			<path
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+			/>
+		</svg>
+	);
+}
