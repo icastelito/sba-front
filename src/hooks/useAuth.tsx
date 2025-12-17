@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
-import type { User, LoginDto, RegisterDto, UpdateProfileDto, ChangePasswordDto, AuthState } from "../types";
+import type { LoginDto, RegisterDto, UpdateProfileDto, ChangePasswordDto, AuthState } from "../types";
 import { authApi, getStoredTokens, clearTokens } from "../lib/auth";
 
 interface AuthContextType extends AuthState {
