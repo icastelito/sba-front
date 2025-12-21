@@ -11,9 +11,14 @@ import {
 	IconTemplate,
 	IconSort,
 	IconTag,
+	IconGrid,
+	IconList,
 	Pagination,
 } from "../ui";
 import { TemplateCard } from "./TemplateCard";
+import { TemplateListView } from "./TemplateListView";
+
+type ViewMode = "grid" | "list";
 
 export function TemplateList() {
 	const navigate = useNavigate();
@@ -24,6 +29,7 @@ export function TemplateList() {
 	});
 
 	const [deleteConfirm, setDeleteConfirm] = useState<Template | null>(null);
+	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
 	const loadTemplates = useCallback(() => {
 		fetchTemplates(filters);
@@ -63,10 +69,30 @@ export function TemplateList() {
 					<IconTemplate size={28} className="page-icon" />
 					<h1 className="page-title">Templates</h1>
 				</div>
-				<button onClick={handleCreate} className="btn btn-primary">
-					<IconPlus size={18} />
-					<span>Novo Template</span>
-				</button>
+				<div className="page-header-actions">
+					<div className="view-toggle">
+						<button
+							onClick={() => setViewMode("grid")}
+							className={`btn btn-icon ${viewMode === "grid" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em grid"
+							title="Cards"
+						>
+							<IconGrid size={18} />
+						</button>
+						<button
+							onClick={() => setViewMode("list")}
+							className={`btn btn-icon ${viewMode === "list" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em lista"
+							title="Lista"
+						>
+							<IconList size={18} />
+						</button>
+					</div>
+					<button onClick={handleCreate} className="btn btn-primary">
+						<IconPlus size={18} />
+						<span>Novo Template</span>
+					</button>
+				</div>
 			</div>
 
 			<div className="filters-bar">
@@ -120,26 +146,36 @@ export function TemplateList() {
 				</div>
 			</div>
 
-			{loading && templates.length === 0 && <Loading />}
-			{error && <ErrorMessage message={error} onRetry={loadTemplates} />}
+			<div className="template-content">
+				{loading && templates.length === 0 && <Loading />}
+				{error && <ErrorMessage message={error} onRetry={loadTemplates} />}
 
-			{!loading && !error && templates.length === 0 && (
-				<div className="empty-state">
-					<IconTemplate size={48} className="empty-state-icon" />
-					<p className="empty-state-title">Nenhum template encontrado</p>
-					<p className="empty-state-description">Crie um template para agilizar a criação de tarefas</p>
-				</div>
-			)}
+				{!loading && !error && templates.length === 0 && (
+					<div className="empty-state">
+						<IconTemplate size={48} className="empty-state-icon" />
+						<p className="empty-state-title">Nenhum template encontrado</p>
+						<p className="empty-state-description">Crie um template para agilizar a criação de tarefas</p>
+					</div>
+				)}
 
-			<div className="template-grid">
-				{templates.map((template) => (
-					<TemplateCard
-						key={template.id}
-						template={template}
+				{viewMode === "grid" ? (
+					<div className="template-grid">
+						{templates.map((template) => (
+							<TemplateCard
+								key={template.id}
+								template={template}
+								onEdit={handleEdit}
+								onDelete={(id) => setDeleteConfirm(templates.find((t) => t.id === id) || null)}
+							/>
+						))}
+					</div>
+				) : (
+					<TemplateListView
+						templates={templates}
 						onEdit={handleEdit}
 						onDelete={(id) => setDeleteConfirm(templates.find((t) => t.id === id) || null)}
 					/>
-				))}
+				)}
 			</div>
 
 			<Pagination meta={pagination} onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))} />

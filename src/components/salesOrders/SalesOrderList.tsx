@@ -3,11 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useSalesOrders } from "../../hooks/useSalesOrders";
 import type { SalesOrder, SalesOrderFilters, OrderStatus } from "../../types";
 import { SalesOrderCard } from "./SalesOrderCard";
+import { SalesOrderListView } from "./SalesOrderListView";
 import { SalesOrderFiltersComponent } from "./SalesOrderFilters";
 import { SalesOrderDetail } from "./SalesOrderDetail";
 import { SalesOrderStatsComponent } from "./SalesOrderStats";
-import { Modal, ConfirmDialog, Loading, ErrorMessage, IconPlus, Pagination } from "../ui";
+import { Modal, ConfirmDialog, Loading, ErrorMessage, IconPlus, IconGrid, IconList, Pagination } from "../ui";
 import { IconShoppingCart } from "../ui/Icons";
+
+type ViewMode = "grid" | "list";
 
 export function SalesOrderList() {
 	const navigate = useNavigate();
@@ -23,6 +26,7 @@ export function SalesOrderList() {
 
 	const [viewingOrder, setViewingOrder] = useState<SalesOrder | null>(null);
 	const [deleteConfirm, setDeleteConfirm] = useState<SalesOrder | null>(null);
+	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
 	// Carregar pedidos
 	useEffect(() => {
@@ -82,17 +86,37 @@ export function SalesOrderList() {
 	};
 
 	return (
-		<div>
+		<div className="page">
 			{/* Header */}
-			<div className="section-header">
-				<h1 className="section-title">
-					<IconShoppingCart size={28} />
-					Pedidos de Venda
-				</h1>
-				<button onClick={handleCreate} className="btn btn-primary">
-					<IconPlus size={18} />
-					Novo Pedido
-				</button>
+			<div className="page-header">
+				<div className="page-title-group">
+					<IconShoppingCart size={28} className="page-icon" />
+					<h1 className="page-title">Pedidos de Venda</h1>
+				</div>
+				<div className="page-header-actions">
+					<div className="view-toggle">
+						<button
+							onClick={() => setViewMode("grid")}
+							className={`btn btn-icon ${viewMode === "grid" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em grid"
+							title="Cards"
+						>
+							<IconGrid size={18} />
+						</button>
+						<button
+							onClick={() => setViewMode("list")}
+							className={`btn btn-icon ${viewMode === "list" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em lista"
+							title="Lista"
+						>
+							<IconList size={18} />
+						</button>
+					</div>
+					<button onClick={handleCreate} className="btn btn-primary">
+						<IconPlus size={18} />
+						<span>Novo Pedido</span>
+					</button>
+				</div>
 			</div>
 
 			{/* Stats */}
@@ -101,37 +125,47 @@ export function SalesOrderList() {
 			{/* Filtros */}
 			<SalesOrderFiltersComponent filters={filters} onFiltersChange={handleFiltersChange} />
 
-			{/* Erro */}
-			{error && <ErrorMessage message={error} />}
+			<div className="order-content">
+				{/* Erro */}
+				{error && <ErrorMessage message={error} />}
 
-			{/* Loading */}
-			{loading && orders.length === 0 && <Loading />}
+				{/* Loading */}
+				{loading && orders.length === 0 && <Loading />}
 
-			{/* Grid de pedidos */}
-			{!loading && orders.length === 0 ? (
-				<div className="empty-state">
-					<IconShoppingCart size={48} className="empty-state-icon" />
-					<p className="empty-state-title">Nenhum pedido encontrado</p>
-					<p className="empty-state-text">
-						{filters.search || filters.status || filters.dateFrom || filters.dateTo
-							? "Tente ajustar os filtros"
-							: "Crie seu primeiro pedido de venda"}
-					</p>
-				</div>
-			) : (
-				<div className={`cards-grid ${loading ? "loading" : ""}`}>
-					{orders.map((order) => (
-						<SalesOrderCard
-							key={order.id}
-							order={order}
-							onView={handleView}
-							onEdit={handleEdit}
-							onUpdateStatus={handleUpdateStatus}
-							onDelete={(id) => setDeleteConfirm(orders.find((o) => o.id === id) || null)}
-						/>
-					))}
-				</div>
-			)}
+				{/* Grid de pedidos */}
+				{!loading && orders.length === 0 ? (
+					<div className="empty-state">
+						<IconShoppingCart size={48} className="empty-state-icon" />
+						<p className="empty-state-title">Nenhum pedido encontrado</p>
+						<p className="empty-state-description">
+							{filters.search || filters.status || filters.dateFrom || filters.dateTo
+								? "Tente ajustar os filtros"
+								: "Crie seu primeiro pedido de venda"}
+						</p>
+					</div>
+				) : viewMode === "grid" ? (
+					<div className={`cards-grid ${loading ? "loading" : ""}`}>
+						{orders.map((order) => (
+							<SalesOrderCard
+								key={order.id}
+								order={order}
+								onView={handleView}
+								onEdit={handleEdit}
+								onUpdateStatus={handleUpdateStatus}
+								onDelete={(id) => setDeleteConfirm(orders.find((o) => o.id === id) || null)}
+							/>
+						))}
+					</div>
+				) : (
+					<SalesOrderListView
+						orders={orders}
+						onView={handleView}
+						onEdit={handleEdit}
+						onUpdateStatus={handleUpdateStatus}
+						onDelete={(id) => setDeleteConfirm(orders.find((o) => o.id === id) || null)}
+					/>
+				)}
+			</div>
 
 			{/* Paginação */}
 			{pagination && <Pagination meta={pagination} onPageChange={handlePageChange} />}

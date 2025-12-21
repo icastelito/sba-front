@@ -3,8 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useProducts } from "../../hooks/useProducts";
 import type { Product, ProductFilters } from "../../types";
 import { ProductCard } from "./ProductCard";
+import { ProductListView } from "./ProductListView";
 import { ProductFiltersComponent } from "./ProductFilters";
-import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconProducts, Pagination } from "../ui";
+import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconProducts, IconGrid, IconList, Pagination } from "../ui";
+
+type ViewMode = "grid" | "list";
 
 export function ProductList() {
 	const navigate = useNavigate();
@@ -31,6 +34,7 @@ export function ProductList() {
 	const [categories, setCategories] = useState<string[]>([]);
 	const [badges, setBadges] = useState<string[]>([]);
 	const [deleteConfirm, setDeleteConfirm] = useState<Product | null>(null);
+	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
 	// Carregar produtos
 	useEffect(() => {
@@ -94,17 +98,37 @@ export function ProductList() {
 	};
 
 	return (
-		<div>
+		<div className="page">
 			{/* Header */}
-			<div className="section-header">
-				<h1 className="section-title">
-					<IconProducts size={28} />
-					Produtos
-				</h1>
-				<button onClick={handleCreate} className="btn btn-primary">
-					<IconPlus size={18} />
-					Novo Produto
-				</button>
+			<div className="page-header">
+				<div className="page-title-group">
+					<IconProducts size={28} className="page-icon" />
+					<h1 className="page-title">Produtos</h1>
+				</div>
+				<div className="page-header-actions">
+					<div className="view-toggle">
+						<button
+							onClick={() => setViewMode("grid")}
+							className={`btn btn-icon ${viewMode === "grid" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em grid"
+							title="Cards"
+						>
+							<IconGrid size={18} />
+						</button>
+						<button
+							onClick={() => setViewMode("list")}
+							className={`btn btn-icon ${viewMode === "list" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em lista"
+							title="Lista"
+						>
+							<IconList size={18} />
+						</button>
+					</div>
+					<button onClick={handleCreate} className="btn btn-primary">
+						<IconPlus size={18} />
+						<span>Novo Produto</span>
+					</button>
+				</div>
 			</div>
 
 			{/* Filtros */}
@@ -115,37 +139,47 @@ export function ProductList() {
 				onFiltersChange={handleFiltersChange}
 			/>
 
-			{/* Erro */}
-			{error && <ErrorMessage message={error} />}
+			<div className="product-content">
+				{/* Erro */}
+				{error && <ErrorMessage message={error} />}
 
-			{/* Loading */}
-			{loading && products.length === 0 && <Loading />}
+				{/* Loading */}
+				{loading && products.length === 0 && <Loading />}
 
-			{/* Grid de produtos */}
-			{!loading && products.length === 0 ? (
-				<div className="empty-state">
-					<IconProducts size={48} className="empty-state-icon" />
-					<p className="empty-state-title">Nenhum produto encontrado</p>
-					<p className="empty-state-text">
-						{filters.search || filters.category || filters.badge
-							? "Tente ajustar os filtros"
-							: "Crie seu primeiro produto"}
-					</p>
-				</div>
-			) : (
-				<div className={`products-grid ${loading ? "loading" : ""}`}>
-					{products.map((product) => (
-						<ProductCard
-							key={product.id}
-							product={product}
-							onEdit={handleEdit}
-							onToggleActive={handleToggleActive}
-							onTogglePublic={handleTogglePublic}
-							onDelete={(id) => setDeleteConfirm(products.find((p) => p.id === id) || null)}
-						/>
-					))}
-				</div>
-			)}
+				{/* Grid de produtos */}
+				{!loading && products.length === 0 ? (
+					<div className="empty-state">
+						<IconProducts size={48} className="empty-state-icon" />
+						<p className="empty-state-title">Nenhum produto encontrado</p>
+						<p className="empty-state-description">
+							{filters.search || filters.category || filters.badge
+								? "Tente ajustar os filtros"
+								: "Crie seu primeiro produto"}
+						</p>
+					</div>
+				) : viewMode === "grid" ? (
+					<div className={`products-grid ${loading ? "loading" : ""}`}>
+						{products.map((product) => (
+							<ProductCard
+								key={product.id}
+								product={product}
+								onEdit={handleEdit}
+								onToggleActive={handleToggleActive}
+								onTogglePublic={handleTogglePublic}
+								onDelete={(id) => setDeleteConfirm(products.find((p) => p.id === id) || null)}
+							/>
+						))}
+					</div>
+				) : (
+					<ProductListView
+						products={products}
+						onEdit={handleEdit}
+						onToggleActive={handleToggleActive}
+						onTogglePublic={handleTogglePublic}
+						onDelete={(id) => setDeleteConfirm(products.find((p) => p.id === id) || null)}
+					/>
+				)}
+			</div>
 
 			{/* Paginação */}
 			{pagination && <Pagination meta={pagination} onPageChange={handlePageChange} />}

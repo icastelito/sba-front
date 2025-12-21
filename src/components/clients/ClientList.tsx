@@ -3,8 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useClients } from "../../hooks/useClients";
 import type { Client, ClientFilters } from "../../types";
 import { ClientCard } from "./ClientCard";
+import { ClientListView } from "./ClientListView";
 import { ClientFiltersComponent } from "./ClientFilters";
-import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconUsers, Pagination } from "../ui";
+import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconUsers, IconGrid, IconList, Pagination } from "../ui";
+
+type ViewMode = "grid" | "list";
 
 export function ClientList() {
 	const navigate = useNavigate();
@@ -21,6 +24,7 @@ export function ClientList() {
 	const [cities, setCities] = useState<string[]>([]);
 	const [states, setStates] = useState<string[]>([]);
 	const [deleteConfirm, setDeleteConfirm] = useState<Client | null>(null);
+	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
 	// Carregar clientes
 	useEffect(() => {
@@ -76,17 +80,37 @@ export function ClientList() {
 	};
 
 	return (
-		<div>
+		<div className="page">
 			{/* Header */}
-			<div className="section-header">
-				<h1 className="section-title">
-					<IconUsers size={28} />
-					Clientes
-				</h1>
-				<button onClick={handleCreate} className="btn btn-primary">
-					<IconPlus size={18} />
-					Novo Cliente
-				</button>
+			<div className="page-header">
+				<div className="page-title-group">
+					<IconUsers size={28} className="page-icon" />
+					<h1 className="page-title">Clientes</h1>
+				</div>
+				<div className="page-header-actions">
+					<div className="view-toggle">
+						<button
+							onClick={() => setViewMode("grid")}
+							className={`btn btn-icon ${viewMode === "grid" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em grid"
+							title="Cards"
+						>
+							<IconGrid size={18} />
+						</button>
+						<button
+							onClick={() => setViewMode("list")}
+							className={`btn btn-icon ${viewMode === "list" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em lista"
+							title="Lista"
+						>
+							<IconList size={18} />
+						</button>
+					</div>
+					<button onClick={handleCreate} className="btn btn-primary">
+						<IconPlus size={18} />
+						<span>Novo Cliente</span>
+					</button>
+				</div>
 			</div>
 
 			{/* Filtros */}
@@ -97,36 +121,45 @@ export function ClientList() {
 				onFiltersChange={handleFiltersChange}
 			/>
 
-			{/* Erro */}
-			{error && <ErrorMessage message={error} />}
+			<div className="client-content">
+				{/* Erro */}
+				{error && <ErrorMessage message={error} />}
 
-			{/* Loading */}
-			{loading && clients.length === 0 && <Loading />}
+				{/* Loading */}
+				{loading && clients.length === 0 && <Loading />}
 
-			{/* Grid de clientes */}
-			{!loading && clients.length === 0 ? (
-				<div className="empty-state">
-					<IconUsers size={48} className="empty-state-icon" />
-					<p className="empty-state-title">Nenhum cliente encontrado</p>
-					<p className="empty-state-text">
-						{filters.search || filters.city || filters.state
-							? "Tente ajustar os filtros"
-							: "Cadastre seu primeiro cliente"}
-					</p>
-				</div>
-			) : (
-				<div className={`cards-grid ${loading ? "loading" : ""}`}>
-					{clients.map((client) => (
-						<ClientCard
-							key={client.id}
-							client={client}
-							onEdit={handleEdit}
-							onToggleActive={handleToggleActive}
-							onDelete={(id) => setDeleteConfirm(clients.find((c) => c.id === id) || null)}
-						/>
-					))}
-				</div>
-			)}
+				{/* Grid de clientes */}
+				{!loading && clients.length === 0 ? (
+					<div className="empty-state">
+						<IconUsers size={48} className="empty-state-icon" />
+						<p className="empty-state-title">Nenhum cliente encontrado</p>
+						<p className="empty-state-description">
+							{filters.search || filters.city || filters.state
+								? "Tente ajustar os filtros"
+								: "Cadastre seu primeiro cliente"}
+						</p>
+					</div>
+				) : viewMode === "grid" ? (
+					<div className={`cards-grid ${loading ? "loading" : ""}`}>
+						{clients.map((client) => (
+							<ClientCard
+								key={client.id}
+								client={client}
+								onEdit={handleEdit}
+								onToggleActive={handleToggleActive}
+								onDelete={(id) => setDeleteConfirm(clients.find((c) => c.id === id) || null)}
+							/>
+						))}
+					</div>
+				) : (
+					<ClientListView
+						clients={clients}
+						onEdit={handleEdit}
+						onToggleActive={handleToggleActive}
+						onDelete={(id) => setDeleteConfirm(clients.find((c) => c.id === id) || null)}
+					/>
+				)}
+			</div>
 
 			{/* Paginação */}
 			{pagination && <Pagination meta={pagination} onPageChange={handlePageChange} />}

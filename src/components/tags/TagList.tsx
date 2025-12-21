@@ -2,10 +2,13 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTags } from "../../hooks";
 import type { Tag, TagFilters } from "../../types";
-import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconTag, Pagination } from "../ui";
+import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconTag, IconGrid, IconList, Pagination } from "../ui";
 import { TagCard } from "./TagCard";
+import { TagListView } from "./TagListView";
 import { TagFiltersBar } from "./TagFilters";
 import { TagStatsBar } from "./TagStats";
+
+type ViewMode = "grid" | "list";
 
 export function TagList() {
 	const navigate = useNavigate();
@@ -19,6 +22,7 @@ export function TagList() {
 
 	const [deleteConfirm, setDeleteConfirm] = useState<Tag | null>(null);
 	const [statsKey, setStatsKey] = useState(0);
+	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
 	const loadTags = useCallback(() => {
 		fetchTags(filters);
@@ -76,10 +80,30 @@ export function TagList() {
 					<IconTag size={28} className="page-icon" />
 					<h1 className="page-title">Tags</h1>
 				</div>
-				<button onClick={handleCreate} className="btn btn-primary">
-					<IconPlus size={18} />
-					<span>Nova Tag</span>
-				</button>
+				<div className="page-header-actions">
+					<div className="view-toggle">
+						<button
+							onClick={() => setViewMode("grid")}
+							className={`btn btn-icon ${viewMode === "grid" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em grid"
+							title="Cards"
+						>
+							<IconGrid size={18} />
+						</button>
+						<button
+							onClick={() => setViewMode("list")}
+							className={`btn btn-icon ${viewMode === "list" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em lista"
+							title="Lista"
+						>
+							<IconList size={18} />
+						</button>
+					</div>
+					<button onClick={handleCreate} className="btn btn-primary">
+						<IconPlus size={18} />
+						<span>Nova Tag</span>
+					</button>
+				</div>
 			</div>
 
 			<TagStatsBar stats={stats} />
@@ -100,17 +124,26 @@ export function TagList() {
 					</div>
 				)}
 
-				<div className="tag-grid">
-					{tags.map((tag) => (
-						<TagCard
-							key={tag.id}
-							tag={tag}
-							onEdit={handleEdit}
-							onToggleActive={handleToggleActive}
-							onDelete={(id) => setDeleteConfirm(tags.find((t) => t.id === id) || null)}
-						/>
-					))}
-				</div>
+				{viewMode === "grid" ? (
+					<div className="tag-grid">
+						{tags.map((tag) => (
+							<TagCard
+								key={tag.id}
+								tag={tag}
+								onEdit={handleEdit}
+								onToggleActive={handleToggleActive}
+								onDelete={(id) => setDeleteConfirm(tags.find((t) => t.id === id) || null)}
+							/>
+						))}
+					</div>
+				) : (
+					<TagListView
+						tags={tags}
+						onEdit={handleEdit}
+						onToggleActive={handleToggleActive}
+						onDelete={(id) => setDeleteConfirm(tags.find((t) => t.id === id) || null)}
+					/>
+				)}
 			</div>
 
 			<Pagination meta={pagination} onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))} />

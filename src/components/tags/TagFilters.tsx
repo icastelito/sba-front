@@ -38,12 +38,15 @@ export function TagFiltersBar({ filters, onFiltersChange }: TagFiltersProps) {
 			</div>
 
 			<div className="filters-group">
-				<div className="filter-item">
-					<IconFilter size={16} />
+				<div className="form-group">
+					<label className="form-label">
+						<IconFilter size={14} />
+						Status
+					</label>
 					<select
 						value={filters.isActive === undefined ? "" : String(filters.isActive)}
 						onChange={handleStatusChange}
-						className="form-select form-select-sm"
+						className="form-select"
 					>
 						<option value="">Todos os status</option>
 						<option value="true">Ativas</option>
@@ -51,12 +54,15 @@ export function TagFiltersBar({ filters, onFiltersChange }: TagFiltersProps) {
 					</select>
 				</div>
 
-				<div className="filter-item">
-					<IconSort size={16} />
+				<div className="form-group">
+					<label className="form-label">
+						<IconSort size={14} />
+						Ordenar
+					</label>
 					<select
 						value={`${filters.sortBy || "name"}-${filters.sortOrder || "asc"}`}
 						onChange={handleSortChange}
-						className="form-select form-select-sm"
+						className="form-select"
 					>
 						<option value="name-asc">Nome (A-Z)</option>
 						<option value="name-desc">Nome (Z-A)</option>
