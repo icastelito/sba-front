@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Todo, CreateTodoDto, UpdateTodoDto, Template, Requester } from "../../types";
 import { TemplateSelect } from "../templates";
-import { TagInput, IconTemplate, IconCalendar, IconUser, IconTag, IconInfo } from "../ui";
+import { TagSelect, IconTemplate, IconCalendar, IconUser, IconTag, IconInfo } from "../ui";
 import { addDays, toISODateString, toDatetimeLocal } from "../../lib/utils";
 
 interface TodoFormProps {
@@ -208,10 +208,10 @@ export function TodoForm({ todo, requesters = [], onSubmit, onCancel, loading }:
 					<IconTag size={14} />
 					Tags
 				</label>
-				<TagInput
+				<TagSelect
 					value={formData.tags}
 					onChange={(tags) => handleChange("tags", tags)}
-					placeholder="Digite e pressione Enter para adicionar"
+					placeholder="Selecionar tags..."
 				/>
 			</div>
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Template, CreateTemplateDto, UpdateTemplateDto } from "../../types";
-import { TagInput, IconCalendar, IconTag, IconInfo } from "../ui";
+import { TagSelect, IconCalendar, IconTag, IconInfo } from "../ui";
 
 interface TemplateFormProps {
 	template?: Template | null;
@@ -122,10 +122,10 @@ export function TemplateForm({ template, onSubmit, onCancel, loading }: Template
 					<IconTag size={14} />
 					Tags
 				</label>
-				<TagInput
+				<TagSelect
 					value={formData.tags}
 					onChange={(tags) => handleChange("tags", tags)}
-					placeholder="Digite e pressione Enter para adicionar"
+					placeholder="Selecionar tags..."
 				/>
 			</div>
 

@@ -4,6 +4,8 @@ export { ConfirmDialog } from "./ConfirmDialog";
 export { Loading } from "./Loading";
 export { ErrorMessage } from "./ErrorMessage";
 export { TagInput } from "./TagInput";
+export { TagSelect } from "./TagSelect";
+export { TagFilterSelect } from "./TagFilterSelect";
 export * from "./Icons";
 export { Pagination } from "./Pagination";
 export { PasswordRequirements } from "./PasswordRequirements";

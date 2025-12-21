@@ -1,6 +1,6 @@
 import type { TodoFilters, TaskStatus, Requester } from "../../types";
 import { TaskStatus as TaskStatusEnum } from "../../types";
-import { SearchInput, IconFilter, IconSort, IconUser, IconTag, IconCalendar } from "../ui";
+import { SearchInput, TagFilterSelect, IconFilter, IconSort, IconUser, IconTag, IconCalendar } from "../ui";
 
 interface TodoFiltersProps {
 	filters: TodoFilters;
@@ -66,12 +66,10 @@ export function TodoFiltersBar({ filters, requesters, onChange }: TodoFiltersPro
 						<IconTag size={14} />
 						Tag
 					</label>
-					<input
-						type="text"
-						value={filters.tag || ""}
-						onChange={(e) => handleChange("tag", e.target.value || undefined)}
+					<TagFilterSelect
+						value={filters.tag}
+						onChange={(tag) => handleChange("tag", tag)}
 						placeholder="Filtrar por tag"
-						className="form-input"
 					/>
 				</div>
 
