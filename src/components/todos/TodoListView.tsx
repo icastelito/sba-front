@@ -1,5 +1,5 @@
 import type { Todo } from "../../types";
-import { formatDate, formatDateTime, isOverdue, isDueToday } from "../../lib/utils";
+import { formatDate, isOverdue, isDueToday } from "../../lib/utils";
 import { IconEdit, IconTrash, IconCalendar, IconUser, IconCheck, IconWarning, IconClock } from "../ui";
 
 interface TodoListViewProps {

@@ -5,6 +5,7 @@ import { AuthProvider } from "./hooks/useAuth";
 import {
 	TodosPage,
 	TemplatesPage,
+	TagsPage,
 	ProductsPage,
 	RequestersPage,
 	ClientsPage,
@@ -39,6 +40,7 @@ function App() {
 							<Route path="shopee" element={<ShopeePage />} />
 							<Route path="tarefas" element={<TodosPage />} />
 							<Route path="templates" element={<TemplatesPage />} />
+							<Route path="tags" element={<TagsPage />} />
 							<Route path="demandantes" element={<RequestersPage />} />
 							<Route path="produtos" element={<ProductsPage />} />
 							<Route path="clientes" element={<ClientsPage />} />

@@ -1,5 +1,6 @@
 export { TodosPage } from "./TodosPage";
 export { TemplatesPage } from "./TemplatesPage";
+export { TagsPage } from "./TagsPage";
 export { ProductsPage } from "./ProductsPage";
 export { RequestersPage } from "./RequestersPage";
 export { ClientsPage } from "./ClientsPage";

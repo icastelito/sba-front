@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import {
 	IconTasks,
 	IconTemplate,
+	IconTag,
 	IconProducts,
 	IconUsers,
 	IconClients,
@@ -22,6 +23,7 @@ const navItems: NavItem[] = [
 	{ to: "/shopee", label: "Shopee", icon: <IconShopee size={18} /> },
 	{ to: "/tarefas", label: "Tarefas", icon: <IconTasks size={18} /> },
 	{ to: "/templates", label: "Templates", icon: <IconTemplate size={18} /> },
+	{ to: "/tags", label: "Tags", icon: <IconTag size={18} /> },
 	{ to: "/demandantes", label: "Demandantes", icon: <IconUsers size={18} /> },
 	{ to: "/produtos", label: "Produtos", icon: <IconProducts size={18} /> },
 	{ to: "/clientes", label: "Clientes", icon: <IconClients size={18} /> },

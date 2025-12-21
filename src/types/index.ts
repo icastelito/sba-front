@@ -517,3 +517,54 @@ export interface SalesOrderStats {
 	totalRevenue: number;
 	todayOrders: number;
 }
+
+// ==================== TAG ====================
+
+export interface Tag {
+	id: string;
+	name: string;
+	color: string | null;
+	description: string | null;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface TagSimple {
+	id: string;
+	name: string;
+	color: string | null;
+}
+
+export interface CreateTagDto {
+	name: string;
+	color?: string;
+	description?: string;
+	isActive?: boolean;
+}
+
+export interface UpdateTagDto {
+	name?: string;
+	color?: string;
+	description?: string;
+	isActive?: boolean;
+}
+
+export interface TagFilters {
+	search?: string;
+	isActive?: boolean;
+	page?: number;
+	limit?: number;
+	sortBy?: "name" | "createdAt" | "updatedAt";
+	sortOrder?: SortOrder;
+}
+
+export interface TagStats {
+	total: number;
+	active: number;
+	inactive: number;
+	mostUsed: Array<{
+		name: string;
+		usageCount: number;
+	}>;
+}
