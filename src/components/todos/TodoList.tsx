@@ -1,12 +1,25 @@
 import { useEffect, useState, useCallback } from "react";
 import { useTodos } from "../../hooks";
 import type { Todo, TodoFilters, CreateTodoDto, UpdateTodoDto } from "../../types";
-import { Modal, ConfirmDialog, Loading, ErrorMessage, IconPlus, IconTasks, Pagination } from "../ui";
+import {
+	Modal,
+	ConfirmDialog,
+	Loading,
+	ErrorMessage,
+	IconPlus,
+	IconTasks,
+	Pagination,
+	IconGrid,
+	IconList,
+} from "../ui";
 import { TodoCard } from "./TodoCard";
+import { TodoListView } from "./TodoListView";
 import { TodoForm } from "./TodoForm";
 import { TodoFiltersBar } from "./TodoFilters";
 import { TodoStatsBar } from "./TodoStats";
 import { TodoCompleteModal } from "./TodoCompleteModal";
+
+type ViewMode = "grid" | "list";
 
 export function TodoList() {
 	const {
@@ -36,6 +49,7 @@ export function TodoList() {
 	const [completeConfirm, setCompleteConfirm] = useState<Todo | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 	const [statsKey, setStatsKey] = useState(0);
+	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
 	const loadTodos = useCallback(() => {
 		fetchTodos(filters);
@@ -129,38 +143,70 @@ export function TodoList() {
 					<IconTasks size={28} className="page-icon" />
 					<h1 className="page-title">Tarefas</h1>
 				</div>
-				<button onClick={handleCreate} className="btn btn-primary">
-					<IconPlus size={18} />
-					<span>Nova Tarefa</span>
-				</button>
+				<div className="page-header-actions">
+					<div className="view-toggle">
+						<button
+							onClick={() => setViewMode("grid")}
+							className={`btn btn-icon ${viewMode === "grid" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em grid"
+							title="Cards"
+						>
+							<IconGrid size={18} />
+						</button>
+						<button
+							onClick={() => setViewMode("list")}
+							className={`btn btn-icon ${viewMode === "list" ? "btn-primary" : "btn-ghost"}`}
+							aria-label="Visualização em lista"
+							title="Lista"
+						>
+							<IconList size={18} />
+						</button>
+					</div>
+					<button onClick={handleCreate} className="btn btn-primary">
+						<IconPlus size={18} />
+						<span>Nova Tarefa</span>
+					</button>
+				</div>
 			</div>
 
 			<TodoStatsBar key={statsKey} />
 
 			<TodoFiltersBar filters={filters} requesters={requesters} onChange={handleFiltersChange} />
 
-			{loading && todos.length === 0 && <Loading />}
-			{error && <ErrorMessage message={error} onRetry={loadTodos} />}
+			<div className="todo-content">
+				{loading && todos.length === 0 && <Loading />}
+				{error && <ErrorMessage message={error} onRetry={loadTodos} />}
 
-			{!loading && !error && todos.length === 0 && (
-				<div className="empty-state">
-					<IconTasks size={48} className="empty-state-icon" />
-					<p className="empty-state-title">Nenhuma tarefa encontrada</p>
-					<p className="empty-state-description">Crie uma nova tarefa ou ajuste os filtros de busca</p>
-				</div>
-			)}
+				{!loading && !error && todos.length === 0 && (
+					<div className="empty-state">
+						<IconTasks size={48} className="empty-state-icon" />
+						<p className="empty-state-title">Nenhuma tarefa encontrada</p>
+						<p className="empty-state-description">Crie uma nova tarefa ou ajuste os filtros de busca</p>
+					</div>
+				)}
 
-			<div className="todo-grid">
-				{todos.map((todo) => (
-					<TodoCard
-						key={todo.id}
-						todo={todo}
-						onComplete={() => handleComplete(todo)}
-						onReopen={() => handleReopen(todo.id)}
+				{viewMode === "grid" ? (
+					<div className="todo-grid">
+						{todos.map((todo) => (
+							<TodoCard
+								key={todo.id}
+								todo={todo}
+								onComplete={() => handleComplete(todo)}
+								onReopen={() => handleReopen(todo.id)}
+								onEdit={handleEdit}
+								onDelete={(id) => setDeleteConfirm(todos.find((t) => t.id === id) || null)}
+							/>
+						))}
+					</div>
+				) : (
+					<TodoListView
+						todos={todos}
+						onComplete={handleComplete}
+						onReopen={handleReopen}
 						onEdit={handleEdit}
 						onDelete={(id) => setDeleteConfirm(todos.find((t) => t.id === id) || null)}
 					/>
-				))}
+				)}
 			</div>
 
 			<Pagination meta={pagination} onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))} />

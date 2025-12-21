@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import type { TodoStats } from "../../types";
 import { useTodos } from "../../hooks";
-import { IconTotal, IconPending, IconCompleted, IconWarning, IconClock } from "../ui";
+import { IconCompleted, IconWarning, IconClock } from "../ui";
 
 interface TodoStatsProps {
 	assignedTo?: string;
@@ -36,7 +36,7 @@ export function TodoStatsBar({ assignedTo }: TodoStatsProps) {
 		<div className="stats-grid">
 			<div className="stat-card stat-card-primary">
 				<div className="stat-icon">
-					<IconTotal size={20} />
+					<IconCompleted size={20} />
 				</div>
 				<div className="stat-content">
 					<div className="stat-value">{stats.total}</div>
@@ -45,7 +45,7 @@ export function TodoStatsBar({ assignedTo }: TodoStatsProps) {
 			</div>
 			<div className="stat-card stat-card-warning">
 				<div className="stat-icon">
-					<IconPending size={20} />
+					<IconClock size={20} />
 				</div>
 				<div className="stat-content">
 					<div className="stat-value">{stats.pending}</div>
