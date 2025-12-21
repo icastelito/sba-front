@@ -1,33 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSalesOrders } from "../../hooks/useSalesOrders";
-import { useClients } from "../../hooks/useClients";
-import { useProducts } from "../../hooks/useProducts";
-import type { SalesOrder, SalesOrderFilters, CreateSalesOrderDto, UpdateSalesOrderDto, OrderStatus } from "../../types";
+import type { SalesOrder, SalesOrderFilters, OrderStatus } from "../../types";
 import { SalesOrderCard } from "./SalesOrderCard";
 import { SalesOrderFiltersComponent } from "./SalesOrderFilters";
-import { SalesOrderForm } from "./SalesOrderForm";
 import { SalesOrderDetail } from "./SalesOrderDetail";
 import { SalesOrderStatsComponent } from "./SalesOrderStats";
 import { Modal, ConfirmDialog, Loading, ErrorMessage, IconPlus, Pagination } from "../ui";
 import { IconShoppingCart } from "../ui/Icons";
 
 export function SalesOrderList() {
-	const {
-		orders,
-		loading,
-		error,
-		pagination,
-		stats,
-		fetchOrders,
-		fetchStats,
-		createOrder,
-		updateOrder,
-		updateStatus,
-		deleteOrder,
-	} = useSalesOrders();
-
-	const { clients, fetchClients } = useClients();
-	const { products, fetchProducts } = useProducts();
+	const navigate = useNavigate();
+	const { orders, loading, error, pagination, stats, fetchOrders, fetchStats, updateStatus, deleteOrder } =
+		useSalesOrders();
 
 	const [filters, setFilters] = useState<SalesOrderFilters>({
 		page: 1,
@@ -36,11 +21,8 @@ export function SalesOrderList() {
 		sortOrder: "desc",
 	});
 
-	const [isFormOpen, setIsFormOpen] = useState(false);
-	const [editingOrder, setEditingOrder] = useState<SalesOrder | null>(null);
 	const [viewingOrder, setViewingOrder] = useState<SalesOrder | null>(null);
 	const [deleteConfirm, setDeleteConfirm] = useState<SalesOrder | null>(null);
-	const [formLoading, setFormLoading] = useState(false);
 
 	// Carregar pedidos
 	useEffect(() => {
@@ -52,48 +34,20 @@ export function SalesOrderList() {
 		fetchStats();
 	}, [fetchStats]);
 
-	// Carregar clientes e produtos para o formulário
-	useEffect(() => {
-		fetchClients({ limit: 100, isActive: true });
-		fetchProducts({ limit: 100, isActive: true });
-	}, [fetchClients, fetchProducts]);
-
 	const handleFiltersChange = useCallback((newFilters: SalesOrderFilters) => {
 		setFilters(newFilters);
 	}, []);
 
 	const handleCreate = () => {
-		setEditingOrder(null);
-		setIsFormOpen(true);
+		navigate("/pedidos/novo");
 	};
 
 	const handleEdit = (order: SalesOrder) => {
-		setEditingOrder(order);
-		setIsFormOpen(true);
+		navigate(`/pedidos/${order.id}/editar`);
 	};
 
 	const handleView = (order: SalesOrder) => {
 		setViewingOrder(order);
-	};
-
-	const handleFormSubmit = async (data: CreateSalesOrderDto | UpdateSalesOrderDto) => {
-		setFormLoading(true);
-		try {
-			if (editingOrder) {
-				await updateOrder(editingOrder.id, data as UpdateSalesOrderDto);
-			} else {
-				await createOrder(data as CreateSalesOrderDto);
-			}
-			setIsFormOpen(false);
-			setEditingOrder(null);
-			// Recarregar pedidos e stats
-			fetchOrders(filters);
-			fetchStats();
-		} catch (err) {
-			alert(err instanceof Error ? err.message : "Erro ao salvar pedido");
-		} finally {
-			setFormLoading(false);
-		}
 	};
 
 	const handleUpdateStatus = async (id: string, status: OrderStatus) => {
@@ -181,29 +135,6 @@ export function SalesOrderList() {
 
 			{/* Paginação */}
 			{pagination && <Pagination meta={pagination} onPageChange={handlePageChange} />}
-
-			{/* Modal de formulário */}
-			<Modal
-				isOpen={isFormOpen}
-				onClose={() => {
-					setIsFormOpen(false);
-					setEditingOrder(null);
-				}}
-				title={editingOrder ? "Editar Pedido" : "Novo Pedido"}
-				size="large"
-			>
-				<SalesOrderForm
-					order={editingOrder}
-					clients={clients}
-					products={products}
-					onSubmit={handleFormSubmit}
-					onCancel={() => {
-						setIsFormOpen(false);
-						setEditingOrder(null);
-					}}
-					loading={formLoading}
-				/>
-			</Modal>
 
 			{/* Modal de detalhes */}
 			<Modal isOpen={!!viewingOrder} onClose={() => setViewingOrder(null)} title="" size="large">

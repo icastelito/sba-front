@@ -1,15 +1,15 @@
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTags } from "../../hooks";
-import type { Tag, TagFilters, CreateTagDto, UpdateTagDto } from "../../types";
-import { Modal, ConfirmDialog, Loading, ErrorMessage, IconPlus, IconTag, Pagination } from "../ui";
+import type { Tag, TagFilters } from "../../types";
+import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconTag, Pagination } from "../ui";
 import { TagCard } from "./TagCard";
-import { TagForm } from "./TagForm";
 import { TagFiltersBar } from "./TagFilters";
 import { TagStatsBar } from "./TagStats";
 
 export function TagList() {
-	const { tags, loading, error, pagination, stats, fetchTags, fetchStats, createTag, updateTag, deleteTag } =
-		useTags();
+	const navigate = useNavigate();
+	const { tags, loading, error, pagination, stats, fetchTags, fetchStats, updateTag, deleteTag } = useTags();
 
 	const [filters, setFilters] = useState<TagFilters>({
 		limit: 20,
@@ -17,10 +17,7 @@ export function TagList() {
 		sortOrder: "asc",
 	});
 
-	const [modalOpen, setModalOpen] = useState(false);
-	const [editingTag, setEditingTag] = useState<Tag | null>(null);
 	const [deleteConfirm, setDeleteConfirm] = useState<Tag | null>(null);
-	const [submitting, setSubmitting] = useState(false);
 	const [statsKey, setStatsKey] = useState(0);
 
 	const loadTags = useCallback(() => {
@@ -40,31 +37,11 @@ export function TagList() {
 	};
 
 	const handleCreate = () => {
-		setEditingTag(null);
-		setModalOpen(true);
+		navigate("/tags/novo");
 	};
 
 	const handleEdit = (tag: Tag) => {
-		setEditingTag(tag);
-		setModalOpen(true);
-	};
-
-	const handleSubmit = async (data: CreateTagDto | UpdateTagDto) => {
-		setSubmitting(true);
-		try {
-			if (editingTag) {
-				await updateTag(editingTag.id, data);
-			} else {
-				await createTag(data as CreateTagDto);
-			}
-			setModalOpen(false);
-			loadTags();
-			setStatsKey((k) => k + 1);
-		} catch (err) {
-			alert(err instanceof Error ? err.message : "Erro ao salvar");
-		} finally {
-			setSubmitting(false);
-		}
+		navigate(`/tags/${tag.id}/editar`);
 	};
 
 	const handleToggleActive = async (id: string) => {
@@ -137,19 +114,6 @@ export function TagList() {
 			</div>
 
 			<Pagination meta={pagination} onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))} />
-
-			<Modal
-				isOpen={modalOpen}
-				onClose={() => setModalOpen(false)}
-				title={editingTag ? "Editar Tag" : "Nova Tag"}
-			>
-				<TagForm
-					tag={editingTag}
-					onSubmit={handleSubmit}
-					onCancel={() => setModalOpen(false)}
-					loading={submitting}
-				/>
-			</Modal>
 
 			<ConfirmDialog
 				isOpen={!!deleteConfirm}

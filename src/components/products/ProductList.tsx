@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useProducts } from "../../hooks/useProducts";
-import type { Product, ProductFilters, CreateProductDto, UpdateProductDto } from "../../types";
+import type { Product, ProductFilters } from "../../types";
 import { ProductCard } from "./ProductCard";
 import { ProductFiltersComponent } from "./ProductFilters";
-import { ProductForm } from "./ProductForm";
-import { Modal, ConfirmDialog, Loading, ErrorMessage, IconPlus, IconProducts, Pagination } from "../ui";
+import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconProducts, Pagination } from "../ui";
 
 export function ProductList() {
+	const navigate = useNavigate();
 	const {
 		products,
 		loading,
@@ -15,8 +16,6 @@ export function ProductList() {
 		fetchProducts,
 		fetchCategories,
 		fetchBadges,
-		createProduct,
-		updateProduct,
 		toggleActive,
 		togglePublic,
 		deleteProduct,
@@ -31,11 +30,7 @@ export function ProductList() {
 
 	const [categories, setCategories] = useState<string[]>([]);
 	const [badges, setBadges] = useState<string[]>([]);
-
-	const [isFormOpen, setIsFormOpen] = useState(false);
-	const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 	const [deleteConfirm, setDeleteConfirm] = useState<Product | null>(null);
-	const [formLoading, setFormLoading] = useState(false);
 
 	// Carregar produtos
 	useEffect(() => {
@@ -61,36 +56,11 @@ export function ProductList() {
 	}, []);
 
 	const handleCreate = () => {
-		setEditingProduct(null);
-		setIsFormOpen(true);
+		navigate("/produtos/novo");
 	};
 
 	const handleEdit = (product: Product) => {
-		setEditingProduct(product);
-		setIsFormOpen(true);
-	};
-
-	const handleFormSubmit = async (data: CreateProductDto | UpdateProductDto, imageFile?: File) => {
-		setFormLoading(true);
-		try {
-			if (editingProduct) {
-				await updateProduct(editingProduct.id, data as UpdateProductDto, imageFile);
-			} else {
-				await createProduct(data as CreateProductDto, imageFile);
-			}
-			setIsFormOpen(false);
-			setEditingProduct(null);
-			// Recarregar categorias e badges caso tenha criado novos
-			const [cats, bdgs] = await Promise.all([fetchCategories(), fetchBadges()]);
-			setCategories(cats || []);
-			setBadges(bdgs || []);
-			// Recarregar produtos
-			fetchProducts(filters);
-		} catch (err) {
-			alert(err instanceof Error ? err.message : "Erro ao salvar produto");
-		} finally {
-			setFormLoading(false);
-		}
+		navigate(`/produtos/${product.id}/editar`);
 	};
 
 	const handleToggleActive = async (id: string) => {
@@ -179,29 +149,6 @@ export function ProductList() {
 
 			{/* Paginação */}
 			{pagination && <Pagination meta={pagination} onPageChange={handlePageChange} />}
-
-			{/* Modal de formulário */}
-			<Modal
-				isOpen={isFormOpen}
-				onClose={() => {
-					setIsFormOpen(false);
-					setEditingProduct(null);
-				}}
-				title={editingProduct ? "Editar Produto" : "Novo Produto"}
-				size="large"
-			>
-				<ProductForm
-					product={editingProduct}
-					categories={categories}
-					badges={badges}
-					onSubmit={handleFormSubmit}
-					onCancel={() => {
-						setIsFormOpen(false);
-						setEditingProduct(null);
-					}}
-					loading={formLoading}
-				/>
-			</Modal>
 
 			{/* Confirmação de exclusão */}
 			<ConfirmDialog

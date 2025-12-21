@@ -1,25 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useClients } from "../../hooks/useClients";
-import type { Client, ClientFilters, CreateClientDto, UpdateClientDto } from "../../types";
+import type { Client, ClientFilters } from "../../types";
 import { ClientCard } from "./ClientCard";
 import { ClientFiltersComponent } from "./ClientFilters";
-import { ClientForm } from "./ClientForm";
-import { Modal, ConfirmDialog, Loading, ErrorMessage, IconPlus, IconUsers, Pagination } from "../ui";
+import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconUsers, Pagination } from "../ui";
 
 export function ClientList() {
-	const {
-		clients,
-		loading,
-		error,
-		pagination,
-		fetchClients,
-		fetchCities,
-		fetchStates,
-		createClient,
-		updateClient,
-		deleteClient,
-		toggleActive,
-	} = useClients();
+	const navigate = useNavigate();
+	const { clients, loading, error, pagination, fetchClients, fetchCities, fetchStates, deleteClient, toggleActive } =
+		useClients();
 
 	const [filters, setFilters] = useState<ClientFilters>({
 		page: 1,
@@ -30,11 +20,7 @@ export function ClientList() {
 
 	const [cities, setCities] = useState<string[]>([]);
 	const [states, setStates] = useState<string[]>([]);
-
-	const [isFormOpen, setIsFormOpen] = useState(false);
-	const [editingClient, setEditingClient] = useState<Client | null>(null);
 	const [deleteConfirm, setDeleteConfirm] = useState<Client | null>(null);
-	const [formLoading, setFormLoading] = useState(false);
 
 	// Carregar clientes
 	useEffect(() => {
@@ -60,36 +46,11 @@ export function ClientList() {
 	}, []);
 
 	const handleCreate = () => {
-		setEditingClient(null);
-		setIsFormOpen(true);
+		navigate("/clientes/novo");
 	};
 
 	const handleEdit = (client: Client) => {
-		setEditingClient(client);
-		setIsFormOpen(true);
-	};
-
-	const handleFormSubmit = async (data: CreateClientDto | UpdateClientDto) => {
-		setFormLoading(true);
-		try {
-			if (editingClient) {
-				await updateClient(editingClient.id, data as UpdateClientDto);
-			} else {
-				await createClient(data as CreateClientDto);
-			}
-			setIsFormOpen(false);
-			setEditingClient(null);
-			// Recarregar cidades e estados
-			const [citiesData, statesData] = await Promise.all([fetchCities(), fetchStates()]);
-			setCities(citiesData || []);
-			setStates(statesData || []);
-			// Recarregar clientes
-			fetchClients(filters);
-		} catch (err) {
-			alert(err instanceof Error ? err.message : "Erro ao salvar cliente");
-		} finally {
-			setFormLoading(false);
-		}
+		navigate(`/clientes/${client.id}/editar`);
 	};
 
 	const handleToggleActive = async (id: string) => {
@@ -169,27 +130,6 @@ export function ClientList() {
 
 			{/* Paginação */}
 			{pagination && <Pagination meta={pagination} onPageChange={handlePageChange} />}
-
-			{/* Modal de formulário */}
-			<Modal
-				isOpen={isFormOpen}
-				onClose={() => {
-					setIsFormOpen(false);
-					setEditingClient(null);
-				}}
-				title={editingClient ? "Editar Cliente" : "Novo Cliente"}
-				size="large"
-			>
-				<ClientForm
-					client={editingClient}
-					onSubmit={handleFormSubmit}
-					onCancel={() => {
-						setIsFormOpen(false);
-						setEditingClient(null);
-					}}
-					loading={formLoading}
-				/>
-			</Modal>
 
 			{/* Diálogo de confirmação de exclusão */}
 			<ConfirmDialog

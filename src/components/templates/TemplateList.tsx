@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTemplates } from "../../hooks";
-import type { Template, TemplateFilters, CreateTemplateDto, UpdateTemplateDto } from "../../types";
+import type { Template, TemplateFilters } from "../../types";
 import {
-	Modal,
 	ConfirmDialog,
 	Loading,
 	ErrorMessage,
@@ -14,20 +14,16 @@ import {
 	Pagination,
 } from "../ui";
 import { TemplateCard } from "./TemplateCard";
-import { TemplateForm } from "./TemplateForm";
 
 export function TemplateList() {
-	const { templates, loading, error, pagination, fetchTemplates, createTemplate, updateTemplate, deleteTemplate } =
-		useTemplates();
+	const navigate = useNavigate();
+	const { templates, loading, error, pagination, fetchTemplates, deleteTemplate } = useTemplates();
 
 	const [filters, setFilters] = useState<TemplateFilters>({
 		limit: 20,
 	});
 
-	const [modalOpen, setModalOpen] = useState(false);
-	const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
 	const [deleteConfirm, setDeleteConfirm] = useState<Template | null>(null);
-	const [submitting, setSubmitting] = useState(false);
 
 	const loadTemplates = useCallback(() => {
 		fetchTemplates(filters);
@@ -42,30 +38,11 @@ export function TemplateList() {
 	};
 
 	const handleCreate = () => {
-		setEditingTemplate(null);
-		setModalOpen(true);
+		navigate("/templates/novo");
 	};
 
 	const handleEdit = (template: Template) => {
-		setEditingTemplate(template);
-		setModalOpen(true);
-	};
-
-	const handleSubmit = async (data: CreateTemplateDto | UpdateTemplateDto) => {
-		setSubmitting(true);
-		try {
-			if (editingTemplate) {
-				await updateTemplate(editingTemplate.id, data);
-			} else {
-				await createTemplate(data as CreateTemplateDto);
-			}
-			setModalOpen(false);
-			loadTemplates();
-		} catch (err) {
-			alert(err instanceof Error ? err.message : "Erro ao salvar");
-		} finally {
-			setSubmitting(false);
-		}
+		navigate(`/templates/${template.id}/editar`);
 	};
 
 	const handleDelete = async () => {
@@ -166,19 +143,6 @@ export function TemplateList() {
 			</div>
 
 			<Pagination meta={pagination} onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))} />
-
-			<Modal
-				isOpen={modalOpen}
-				onClose={() => setModalOpen(false)}
-				title={editingTemplate ? "Editar Template" : "Novo Template"}
-			>
-				<TemplateForm
-					template={editingTemplate}
-					onSubmit={handleSubmit}
-					onCancel={() => setModalOpen(false)}
-					loading={submitting}
-				/>
-			</Modal>
 
 			<ConfirmDialog
 				isOpen={!!deleteConfirm}

@@ -1,10 +1,17 @@
 export { TodosPage } from "./TodosPage";
+export { TodoCreatePage, TodoEditPage } from "./TodoFormPages";
 export { TemplatesPage } from "./TemplatesPage";
+export { TemplateCreatePage, TemplateEditPage } from "./TemplateFormPages";
 export { TagsPage } from "./TagsPage";
+export { TagCreatePage, TagEditPage } from "./TagFormPages";
 export { ProductsPage } from "./ProductsPage";
+export { ProductCreatePage, ProductEditPage } from "./ProductFormPages";
 export { RequestersPage } from "./RequestersPage";
+export { RequesterCreatePage, RequesterEditPage } from "./RequesterFormPages";
 export { ClientsPage } from "./ClientsPage";
+export { ClientCreatePage, ClientEditPage } from "./ClientFormPages";
 export { SalesOrdersPage } from "./SalesOrdersPage";
+export { SalesOrderCreatePage, SalesOrderEditPage } from "./SalesOrderFormPages";
 export { LoginPage } from "./LoginPage";
 export { RegisterPage } from "./RegisterPage";
 export { ProfilePage } from "./ProfilePage";

@@ -682,6 +682,12 @@ p {
 	margin-bottom: var(--space-6);
 }
 
+.page-header-content {
+	display: flex;
+	align-items: center;
+	gap: var(--space-4);
+}
+
 .page-header-actions {
 	display: flex;
 	align-items: center;
@@ -2357,6 +2363,63 @@ p {
 	margin-top: var(--space-6);
 	padding-top: var(--space-5);
 	border-top: 1px solid var(--border-light);
+}
+
+/* Form Page Container */
+.form-page-container {
+	max-width: 600px;
+	margin: 0 auto;
+	background: var(--bg-secondary);
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--border-light);
+	padding: var(--space-6);
+	box-shadow: var(--shadow-md);
+}
+
+.form-page-container.form-page-wide {
+	max-width: 900px;
+}
+
+.form-page-container .form {
+	gap: var(--space-5);
+}
+
+.form-page-container .form-label-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-3);
+	margin-bottom: var(--space-2);
+}
+
+/* Form Row 3 columns */
+.form-row-3 {
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+.form-input-with-icon {
+	position: relative;
+}
+
+.form-input-with-icon .form-input {
+	padding-right: var(--space-8);
+}
+
+.input-icon-loading {
+	position: absolute;
+	right: var(--space-3);
+	top: 50%;
+	transform: translateY(-50%);
+	color: var(--text-tertiary);
+	font-size: 0.75rem;
+}
+
+/* Form Help Text */
+.form-help {
+	display: block;
+	font-size: var(--text-xs);
+	color: var(--text-tertiary);
+	margin-top: var(--space-1);
 }
 
 .required {

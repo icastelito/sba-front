@@ -1,33 +1,21 @@
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useRequesters } from "../../hooks";
-import type { RequesterFilters, CreateRequesterDto, UpdateRequesterDto } from "../../hooks/useRequesters";
+import type { RequesterFilters } from "../../hooks/useRequesters";
 import type { Requester } from "../../types";
-import { Modal, ConfirmDialog, Loading, ErrorMessage, Pagination, IconPlus, IconUsers } from "../ui";
+import { ConfirmDialog, Loading, ErrorMessage, Pagination, IconPlus, IconUsers } from "../ui";
 import { RequesterCard } from "./RequesterCard";
-import { RequesterForm } from "./RequesterForm";
 import { RequesterFiltersBar } from "./RequesterFilters";
 
 export function RequesterList() {
-	const {
-		requesters,
-		loading,
-		error,
-		pagination,
-		fetchRequesters,
-		createRequester,
-		updateRequester,
-		toggleActive,
-		deleteRequester,
-	} = useRequesters();
+	const navigate = useNavigate();
+	const { requesters, loading, error, pagination, fetchRequesters, toggleActive, deleteRequester } = useRequesters();
 
 	const [filters, setFilters] = useState<RequesterFilters>({
 		limit: 20,
 	});
 
-	const [modalOpen, setModalOpen] = useState(false);
-	const [editingRequester, setEditingRequester] = useState<Requester | null>(null);
 	const [deleteConfirm, setDeleteConfirm] = useState<Requester | null>(null);
-	const [submitting, setSubmitting] = useState(false);
 
 	const loadRequesters = useCallback(() => {
 		fetchRequesters(filters);
@@ -42,30 +30,11 @@ export function RequesterList() {
 	};
 
 	const handleCreate = () => {
-		setEditingRequester(null);
-		setModalOpen(true);
+		navigate("/demandantes/novo");
 	};
 
 	const handleEdit = (requester: Requester) => {
-		setEditingRequester(requester);
-		setModalOpen(true);
-	};
-
-	const handleSubmit = async (data: CreateRequesterDto | UpdateRequesterDto) => {
-		setSubmitting(true);
-		try {
-			if (editingRequester) {
-				await updateRequester(editingRequester.id, data);
-			} else {
-				await createRequester(data as CreateRequesterDto);
-			}
-			setModalOpen(false);
-			loadRequesters();
-		} catch (err) {
-			alert(err instanceof Error ? err.message : "Erro ao salvar");
-		} finally {
-			setSubmitting(false);
-		}
+		navigate(`/demandantes/${requester.id}/editar`);
 	};
 
 	const handleToggleActive = async (id: number) => {
@@ -126,19 +95,6 @@ export function RequesterList() {
 			</div>
 
 			<Pagination meta={pagination} onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))} />
-
-			<Modal
-				isOpen={modalOpen}
-				onClose={() => setModalOpen(false)}
-				title={editingRequester ? "Editar Demandante" : "Novo Demandante"}
-			>
-				<RequesterForm
-					requester={editingRequester}
-					onSubmit={handleSubmit}
-					onCancel={() => setModalOpen(false)}
-					loading={submitting}
-				/>
-			</Modal>
 
 			<ConfirmDialog
 				isOpen={!!deleteConfirm}

@@ -1,20 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTodos } from "../../hooks";
-import type { Todo, TodoFilters, CreateTodoDto, UpdateTodoDto } from "../../types";
-import {
-	Modal,
-	ConfirmDialog,
-	Loading,
-	ErrorMessage,
-	IconPlus,
-	IconTasks,
-	Pagination,
-	IconGrid,
-	IconList,
-} from "../ui";
+import type { Todo, TodoFilters } from "../../types";
+import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconTasks, Pagination, IconGrid, IconList } from "../ui";
 import { TodoCard } from "./TodoCard";
 import { TodoListView } from "./TodoListView";
-import { TodoForm } from "./TodoForm";
 import { TodoFiltersBar } from "./TodoFilters";
 import { TodoStatsBar } from "./TodoStats";
 import { TodoCompleteModal } from "./TodoCompleteModal";
@@ -22,6 +12,7 @@ import { TodoCompleteModal } from "./TodoCompleteModal";
 type ViewMode = "grid" | "list";
 
 export function TodoList() {
+	const navigate = useNavigate();
 	const {
 		todos,
 		loading,
@@ -30,8 +21,6 @@ export function TodoList() {
 		requesters,
 		fetchTodos,
 		fetchRequesters,
-		createTodo,
-		updateTodo,
 		completeTodoOptimistic,
 		reopenTodoOptimistic,
 		deleteTodo,
@@ -43,11 +32,8 @@ export function TodoList() {
 		sortOrder: "asc",
 	});
 
-	const [modalOpen, setModalOpen] = useState(false);
-	const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 	const [deleteConfirm, setDeleteConfirm] = useState<Todo | null>(null);
 	const [completeConfirm, setCompleteConfirm] = useState<Todo | null>(null);
-	const [submitting, setSubmitting] = useState(false);
 	const [statsKey, setStatsKey] = useState(0);
 	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
@@ -68,36 +54,11 @@ export function TodoList() {
 	};
 
 	const handleCreate = () => {
-		setEditingTodo(null);
-		setModalOpen(true);
+		navigate("/tarefas/novo");
 	};
 
 	const handleEdit = (todo: Todo) => {
-		setEditingTodo(todo);
-		setModalOpen(true);
-	};
-
-	const handleSubmit = async (data: CreateTodoDto | UpdateTodoDto) => {
-		setSubmitting(true);
-		try {
-			if (editingTodo) {
-				await updateTodo(editingTodo.id, data as UpdateTodoDto);
-			} else {
-				await createTodo(data as CreateTodoDto);
-			}
-			setModalOpen(false);
-			loadTodos();
-			setStatsKey((k) => k + 1);
-		} catch (err) {
-			const message = err instanceof Error ? err.message : "Erro ao salvar";
-			if (message.includes("409") || message.includes("modificada")) {
-				alert("⚠️ Esta tarefa foi modificada. Recarregue e tente novamente.");
-			} else {
-				alert(message);
-			}
-		} finally {
-			setSubmitting(false);
-		}
+		navigate(`/tarefas/${todo.id}/editar`);
 	};
 
 	const handleComplete = (todo: Todo) => {
@@ -210,20 +171,6 @@ export function TodoList() {
 			</div>
 
 			<Pagination meta={pagination} onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))} />
-
-			<Modal
-				isOpen={modalOpen}
-				onClose={() => setModalOpen(false)}
-				title={editingTodo ? "Editar Tarefa" : "Nova Tarefa"}
-			>
-				<TodoForm
-					todo={editingTodo}
-					requesters={requesters}
-					onSubmit={handleSubmit}
-					onCancel={() => setModalOpen(false)}
-					loading={submitting}
-				/>
-			</Modal>
 
 			<TodoCompleteModal
 				isOpen={!!completeConfirm}

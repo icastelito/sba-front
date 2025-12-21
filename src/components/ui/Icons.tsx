@@ -77,4 +77,5 @@ export {
 
 	// Shopee (usando logo genérico por enquanto)
 	IoStorefrontOutline as IconShopee,
+	IoArrowBackOutline as IconArrowLeft,
 } from "react-icons/io5";
