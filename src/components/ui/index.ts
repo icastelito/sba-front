@@ -6,3 +6,4 @@ export { ErrorMessage } from "./ErrorMessage";
 export { TagInput } from "./TagInput";
 export * from "./Icons";
 export { Pagination } from "./Pagination";
+export { PasswordRequirements } from "./PasswordRequirements";

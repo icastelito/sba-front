@@ -2,6 +2,8 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Loading, ErrorMessage } from "../components";
+import { IconEye, IconEyeOff } from "../components/ui/Icons";
+import { PasswordRequirements } from "../components/ui/PasswordRequirements";
 
 interface FormErrors {
 	email?: string;
@@ -27,6 +29,8 @@ export function RegisterPage() {
 	const [generalError, setGeneralError] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 	const validateForm = (): boolean => {
 		const newErrors: FormErrors = {};
@@ -40,7 +44,7 @@ export function RegisterPage() {
 		// Username
 		const usernameRegex = /^[a-zA-Z0-9_]{3,30}$/;
 		if (!usernameRegex.test(formData.username)) {
-			newErrors.username = "Username deve ter 3-30 caracteres (letras, números e _)";
+			newErrors.username = "Nome de Usuário deve ter 3-30 caracteres (letras, números e _)";
 		}
 
 		// Name
@@ -144,7 +148,7 @@ export function RegisterPage() {
 
 					<div className="form-group">
 						<label htmlFor="username" className="form-label">
-							Username *
+							Nome de Usuário *
 						</label>
 						<input
 							type="text"
@@ -152,7 +156,7 @@ export function RegisterPage() {
 							className={`form-input ${errors.username ? "form-input-error" : ""}`}
 							value={formData.username}
 							onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-							placeholder="seu_username"
+							placeholder="Insira um nome de usuário desejado"
 							required
 							autoComplete="username"
 							disabled={isSubmitting}
@@ -188,7 +192,7 @@ export function RegisterPage() {
 							className="form-input"
 							value={formData.nickname}
 							onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-							placeholder="Como gostaria de ser chamado"
+							placeholder="Como gostaria de ser chamado(a)/chamade?"
 							autoComplete="nickname"
 							disabled={isSubmitting}
 						/>
@@ -198,35 +202,82 @@ export function RegisterPage() {
 						<label htmlFor="password" className="form-label">
 							Senha *
 						</label>
-						<input
-							type="password"
-							id="password"
-							className={`form-input ${errors.password ? "form-input-error" : ""}`}
-							value={formData.password}
-							onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-							placeholder="••••••••"
-							required
-							autoComplete="new-password"
-							disabled={isSubmitting}
-						/>
+						<div style={{ position: "relative" }}>
+							<input
+								type={showPassword ? "text" : "password"}
+								id="password"
+								className={`form-input ${errors.password ? "form-input-error" : ""}`}
+								value={formData.password}
+								onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+								placeholder="••••••••"
+								required
+								autoComplete="new-password"
+								disabled={isSubmitting}
+								style={{ paddingRight: "2.5rem" }}
+							/>
+							<button
+								type="button"
+								onClick={() => setShowPassword(!showPassword)}
+								style={{
+									position: "absolute",
+									right: "0.5rem",
+									top: "50%",
+									transform: "translateY(-50%)",
+									background: "none",
+									border: "none",
+									cursor: "pointer",
+									padding: "0.25rem",
+									display: "flex",
+									alignItems: "center",
+									color: "var(--text-secondary)",
+								}}
+								disabled={isSubmitting}
+							>
+								{showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+							</button>
+						</div>
 						{errors.password && <span className="form-error">{errors.password}</span>}
+						<PasswordRequirements password={formData.password} />
 					</div>
 
 					<div className="form-group">
 						<label htmlFor="confirmPassword" className="form-label">
 							Confirmar Senha *
 						</label>
-						<input
-							type="password"
-							id="confirmPassword"
-							className={`form-input ${errors.confirmPassword ? "form-input-error" : ""}`}
-							value={formData.confirmPassword}
-							onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-							placeholder="••••••••"
-							required
-							autoComplete="new-password"
-							disabled={isSubmitting}
-						/>
+						<div style={{ position: "relative" }}>
+							<input
+								type={showConfirmPassword ? "text" : "password"}
+								id="confirmPassword"
+								className={`form-input ${errors.confirmPassword ? "form-input-error" : ""}`}
+								value={formData.confirmPassword}
+								onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+								placeholder="••••••••"
+								required
+								autoComplete="new-password"
+								disabled={isSubmitting}
+								style={{ paddingRight: "2.5rem" }}
+							/>
+							<button
+								type="button"
+								onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+								style={{
+									position: "absolute",
+									right: "0.5rem",
+									top: "50%",
+									transform: "translateY(-50%)",
+									background: "none",
+									border: "none",
+									cursor: "pointer",
+									padding: "0.25rem",
+									display: "flex",
+									alignItems: "center",
+									color: "var(--text-secondary)",
+								}}
+								disabled={isSubmitting}
+							>
+								{showConfirmPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+							</button>
+						</div>
 						{errors.confirmPassword && <span className="form-error">{errors.confirmPassword}</span>}
 					</div>
 

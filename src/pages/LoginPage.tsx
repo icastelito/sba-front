@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Loading, ErrorMessage } from "../components";
+import { IconEye, IconEyeOff } from "../components/ui/Icons";
 
 export function LoginPage() {
 	const navigate = useNavigate();
@@ -13,6 +14,7 @@ export function LoginPage() {
 	});
 	const [error, setError] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
@@ -50,7 +52,7 @@ export function LoginPage() {
 
 					<div className="form-group">
 						<label htmlFor="login" className="form-label">
-							Email ou Username
+							Email ou Nome de Usuário
 						</label>
 						<input
 							type="text"
@@ -58,7 +60,7 @@ export function LoginPage() {
 							className="form-input"
 							value={formData.login}
 							onChange={(e) => setFormData({ ...formData, login: e.target.value })}
-							placeholder="seu@email.com ou username"
+							placeholder="seu@email.com ou nome de usuário"
 							required
 							autoComplete="username"
 							disabled={isSubmitting}
@@ -69,32 +71,53 @@ export function LoginPage() {
 						<label htmlFor="password" className="form-label">
 							Senha
 						</label>
-						<input
-							type="password"
-							id="password"
-							className="form-input"
-							value={formData.password}
-							onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-							placeholder="••••••••"
-							required
-							autoComplete="current-password"
-							disabled={isSubmitting}
-						/>
-					</div>
-
-					<button type="submit" className="btn btn-primary auth-submit" disabled={isSubmitting}>
-						{isSubmitting ? "Entrando..." : "Entrar"}
+				<div style={{ position: "relative" }}>
+					<input
+						type={showPassword ? "text" : "password"}
+						id="password"
+						className="form-input"
+						value={formData.password}
+						onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+						placeholder="••••••••"
+						required
+						autoComplete="current-password"
+						disabled={isSubmitting}
+						style={{ paddingRight: "2.5rem" }}
+					/>
+					<button
+						type="button"
+						onClick={() => setShowPassword(!showPassword)}
+						style={{
+							position: "absolute",
+							right: "0.5rem",
+							top: "50%",
+							transform: "translateY(-50%)",
+							background: "none",
+							border: "none",
+							cursor: "pointer",
+							padding: "0.25rem",
+							display: "flex",
+							alignItems: "center",
+							color: "var(--text-secondary)",
+						}}
+						disabled={isSubmitting}
+					>
+						{showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
 					</button>
+				</div>
+			</div>
+
+			<button type="submit" className="btn btn-primary auth-submit" disabled={isSubmitting}>
+				{isSubmitting ? "Entrando..." : "Entrar"}
+			</button>
 				</form>
 
-				<div className="auth-footer">
-					<p>
-						Não tem uma conta?{" "}
-						<Link to="/register" className="auth-link">
-							Criar conta
-						</Link>
-					</p>
-				</div>
+				<p className="auth-footer">
+					Não tem uma conta?{" "}
+					<Link to="/register" className="auth-link">
+						Criar conta
+					</Link>
+				</p>
 			</div>
 		</div>
 	);

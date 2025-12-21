@@ -613,3 +613,11 @@ export function IconError({ size = 24, ...props }: IconProps) {
 		</svg>
 	);
 }
+
+export function IconX({ size = 24, ...props }: IconProps) {
+	return (
+		<svg {...defaultProps} width={size} height={size} {...props}>
+			<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+		</svg>
+	);
+}

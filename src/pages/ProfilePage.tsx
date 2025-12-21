@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Loading, ErrorMessage, Modal } from "../components";
+import { IconEye, IconEyeOff } from "../components/ui/Icons";
 
 interface ProfileFormData {
 	name: string;
@@ -35,6 +36,9 @@ export function ProfilePage() {
 	const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 	const [isChangingPassword, setIsChangingPassword] = useState(false);
 	const [showLogoutAllModal, setShowLogoutAllModal] = useState(false);
+	const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+	const [showNewPassword, setShowNewPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 	const handleProfileSubmit = async (e: FormEvent) => {
 		e.preventDefault();
@@ -123,7 +127,7 @@ export function ProfilePage() {
 								<span className="profile-info-value">{user.email}</span>
 							</div>
 							<div className="profile-info-item">
-								<span className="profile-info-label">Username</span>
+								<span className="profile-info-label">Nome de Usuário</span>
 								<span className="profile-info-value">@{user.username}</span>
 							</div>
 							<div className="profile-info-item">
@@ -189,7 +193,7 @@ export function ProfilePage() {
 
 							<div className="form-group">
 								<label htmlFor="username" className="form-label">
-									Username
+									Nome de Usuário
 								</label>
 								<input
 									type="text"
@@ -222,32 +226,80 @@ export function ProfilePage() {
 								<label htmlFor="currentPassword" className="form-label">
 									Senha Atual
 								</label>
-								<input
-									type="password"
-									id="currentPassword"
-									className="form-input"
-									value={passwordData.currentPassword}
-									onChange={(e) =>
-										setPasswordData({ ...passwordData, currentPassword: e.target.value })
-									}
-									required
-									disabled={isChangingPassword}
-								/>
+								<div style={{ position: "relative" }}>
+									<input
+										type={showCurrentPassword ? "text" : "password"}
+										id="currentPassword"
+										className="form-input"
+										value={passwordData.currentPassword}
+										onChange={(e) =>
+											setPasswordData({ ...passwordData, currentPassword: e.target.value })
+										}
+										required
+										disabled={isChangingPassword}
+										style={{ paddingRight: "2.5rem" }}
+									/>
+									<button
+										type="button"
+										onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+										style={{
+											position: "absolute",
+											right: "0.5rem",
+											top: "50%",
+											transform: "translateY(-50%)",
+											background: "none",
+											border: "none",
+											cursor: "pointer",
+											padding: "0.25rem",
+											display: "flex",
+											alignItems: "center",
+											color: "var(--text-secondary)",
+										}}
+										disabled={isChangingPassword}
+									>
+										{showCurrentPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+									</button>
+								</div>
 							</div>
 
 							<div className="form-group">
 								<label htmlFor="newPassword" className="form-label">
 									Nova Senha
 								</label>
-								<input
-									type="password"
-									id="newPassword"
-									className="form-input"
-									value={passwordData.newPassword}
-									onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-									required
-									disabled={isChangingPassword}
-								/>
+								<div style={{ position: "relative" }}>
+									<input
+										type={showNewPassword ? "text" : "password"}
+										id="newPassword"
+										className="form-input"
+										value={passwordData.newPassword}
+										onChange={(e) =>
+											setPasswordData({ ...passwordData, newPassword: e.target.value })
+										}
+										required
+										disabled={isChangingPassword}
+										style={{ paddingRight: "2.5rem" }}
+									/>
+									<button
+										type="button"
+										onClick={() => setShowNewPassword(!showNewPassword)}
+										style={{
+											position: "absolute",
+											right: "0.5rem",
+											top: "50%",
+											transform: "translateY(-50%)",
+											background: "none",
+											border: "none",
+											cursor: "pointer",
+											padding: "0.25rem",
+											display: "flex",
+											alignItems: "center",
+											color: "var(--text-secondary)",
+										}}
+										disabled={isChangingPassword}
+									>
+										{showNewPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+									</button>
+								</div>
 								<span className="form-hint">
 									Mínimo 8 caracteres, 1 minúscula, 1 maiúscula e 1 número
 								</span>
@@ -257,17 +309,40 @@ export function ProfilePage() {
 								<label htmlFor="confirmNewPassword" className="form-label">
 									Confirmar Nova Senha
 								</label>
-								<input
-									type="password"
-									id="confirmNewPassword"
-									className="form-input"
-									value={passwordData.confirmPassword}
-									onChange={(e) =>
-										setPasswordData({ ...passwordData, confirmPassword: e.target.value })
-									}
-									required
-									disabled={isChangingPassword}
-								/>
+								<div style={{ position: "relative" }}>
+									<input
+										type={showConfirmPassword ? "text" : "password"}
+										id="confirmNewPassword"
+										className="form-input"
+										value={passwordData.confirmPassword}
+										onChange={(e) =>
+											setPasswordData({ ...passwordData, confirmPassword: e.target.value })
+										}
+										required
+										disabled={isChangingPassword}
+										style={{ paddingRight: "2.5rem" }}
+									/>
+									<button
+										type="button"
+										onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+										style={{
+											position: "absolute",
+											right: "0.5rem",
+											top: "50%",
+											transform: "translateY(-50%)",
+											background: "none",
+											border: "none",
+											cursor: "pointer",
+											padding: "0.25rem",
+											display: "flex",
+											alignItems: "center",
+											color: "var(--text-secondary)",
+										}}
+										disabled={isChangingPassword}
+									>
+										{showConfirmPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+									</button>
+								</div>
 							</div>
 
 							<button type="submit" className="btn btn-primary" disabled={isChangingPassword}>
