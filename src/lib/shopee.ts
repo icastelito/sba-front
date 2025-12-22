@@ -6,6 +6,7 @@ import type {
 	ShopeeStore,
 	ShopeeStoreStatusResponse,
 	ApiResponse,
+	ShopeeSyncProductsResponse,
 } from "../types";
 
 class ShopeeApi {
@@ -42,6 +43,11 @@ class ShopeeApi {
 	// Renovar token da loja
 	async refreshStoreToken(shopId: string): Promise<ApiResponse<{ status: string; tokenExpiresAt: string }>> {
 		return api.post<ApiResponse<{ status: string; tokenExpiresAt: string }>>(`/shopee/stores/${shopId}/refresh`);
+	}
+
+	// Sincronizar produtos da loja
+	async syncProducts(shopId: string): Promise<ShopeeSyncProductsResponse> {
+		return api.post<ShopeeSyncProductsResponse>(`/shopee/stores/${shopId}/sync-products`);
 	}
 }
 

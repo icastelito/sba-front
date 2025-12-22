@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { shopeeApi } from "../lib/shopee";
-import type { ShopeeStore, ShopeeConnectedResponse } from "../types";
+import type { ShopeeStore, ShopeeConnectedResponse, ShopeeSyncProductsResult } from "../types";
 
 interface UseShopeeReturn {
 	stores: ShopeeStore[];
@@ -12,6 +12,7 @@ interface UseShopeeReturn {
 	refreshStoreToken: (shopId: string) => Promise<void>;
 	refreshStores: () => Promise<void>;
 	checkConnection: () => Promise<void>;
+	syncProducts: (shopId: string) => Promise<ShopeeSyncProductsResult>;
 }
 
 export function useShopee(): UseShopeeReturn {
@@ -108,6 +109,26 @@ export function useShopee(): UseShopeeReturn {
 		[loadStores]
 	);
 
+	// Sincronizar produtos da loja
+	const syncProducts = useCallback(
+		async (shopId: string): Promise<ShopeeSyncProductsResult> => {
+			setError(null);
+			try {
+				const response = await shopeeApi.syncProducts(shopId);
+				if (response.success) {
+					await loadStores(); // Atualiza lastSyncAt
+					return response.data;
+				}
+				throw new Error(response.message || "Erro ao sincronizar produtos");
+			} catch (err) {
+				const errorMessage = err instanceof Error ? err.message : "Erro ao sincronizar produtos";
+				setError(errorMessage);
+				throw err;
+			}
+		},
+		[loadStores]
+	);
+
 	return {
 		stores,
 		connectionStatus,
@@ -118,5 +139,6 @@ export function useShopee(): UseShopeeReturn {
 		refreshStoreToken,
 		refreshStores: loadData,
 		checkConnection,
+		syncProducts,
 	};
 }

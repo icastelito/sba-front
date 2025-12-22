@@ -120,6 +120,19 @@ export interface ShopeeStoreStatusResponse {
 	};
 }
 
+export interface ShopeeSyncProductsResult {
+	created: number;
+	updated: number;
+	deactivated: number;
+	errors: string[];
+}
+
+export interface ShopeeSyncProductsResponse {
+	success: boolean;
+	message: string;
+	data: ShopeeSyncProductsResult;
+}
+
 // ==================== ENUMS ====================
 
 export const TaskStatus = {

@@ -1,85 +1,204 @@
 import { useState } from "react";
 import { useShopee } from "../hooks/useShopee";
 import { Loading, ErrorMessage, ConfirmDialog } from "../components";
-import { IconShopee, IconRefresh, IconTrash, IconPlus, IconCheck, IconWarning, IconError } from "../components/ui";
-import type { ShopeeStore, ShopeeStoreStatus } from "../types";
+import {
+	IconShopee,
+	IconRefresh,
+	IconTrash,
+	IconPlus,
+	IconCheck,
+	IconWarning,
+	IconError,
+	IconPackage,
+	IconClock,
+	IconCalendar,
+	IconMapPin,
+} from "../components/ui";
+import type { ShopeeStore, ShopeeStoreStatus, ShopeeSyncProductsResult } from "../types";
 
-const statusConfig: Record<ShopeeStoreStatus, { label: string; color: string; icon: React.ReactNode }> = {
-	ACTIVE: { label: "Ativa", color: "badge-success", icon: <IconCheck size={14} /> },
-	TOKEN_EXPIRED: { label: "Token Expirado", color: "badge-warning", icon: <IconWarning size={14} /> },
-	DISCONNECTED: { label: "Desconectada", color: "badge-secondary", icon: null },
-	ERROR: { label: "Erro", color: "badge-danger", icon: <IconError size={14} /> },
+const statusConfig: Record<
+	ShopeeStoreStatus,
+	{ label: string; color: string; icon: React.ReactNode; bgClass: string }
+> = {
+	ACTIVE: { label: "Conectada", color: "badge-success", icon: <IconCheck size={14} />, bgClass: "status-active" },
+	TOKEN_EXPIRED: {
+		label: "Token Expirado",
+		color: "badge-warning",
+		icon: <IconWarning size={14} />,
+		bgClass: "status-warning",
+	},
+	DISCONNECTED: {
+		label: "Desconectada",
+		color: "badge-secondary",
+		icon: <IconError size={14} />,
+		bgClass: "status-disconnected",
+	},
+	ERROR: { label: "Erro", color: "badge-danger", icon: <IconError size={14} />, bgClass: "status-error" },
 };
+
+// Função para calcular tempo relativo
+function getRelativeTime(date: Date): string {
+	const now = new Date();
+	const diffMs = now.getTime() - date.getTime();
+	const diffMins = Math.floor(diffMs / 60000);
+	const diffHours = Math.floor(diffMs / 3600000);
+	const diffDays = Math.floor(diffMs / 86400000);
+
+	if (diffMins < 1) return "Agora mesmo";
+	if (diffMins < 60) return `Há ${diffMins} min`;
+	if (diffHours < 24) return `Há ${diffHours}h`;
+	if (diffDays === 1) return "Ontem";
+	if (diffDays < 7) return `Há ${diffDays} dias`;
+	return date.toLocaleDateString("pt-BR");
+}
+
+// Função para calcular dias restantes
+function getDaysUntil(date: Date): { days: number; label: string; isUrgent: boolean; isWarning: boolean } {
+	const now = new Date();
+	const diffMs = date.getTime() - now.getTime();
+	const days = Math.ceil(diffMs / 86400000);
+
+	if (days < 0) return { days: 0, label: "Expirado", isUrgent: true, isWarning: false };
+	if (days === 0) return { days: 0, label: "Expira hoje", isUrgent: true, isWarning: false };
+	if (days === 1) return { days: 1, label: "Expira amanhã", isUrgent: false, isWarning: true };
+	if (days <= 3) return { days, label: `${days} dias restantes`, isUrgent: false, isWarning: true };
+	if (days <= 7) return { days, label: `${days} dias restantes`, isUrgent: false, isWarning: false };
+	return { days, label: `${days} dias restantes`, isUrgent: false, isWarning: false };
+}
 
 function StoreCard({
 	store,
 	onDisconnect,
 	onRefreshToken,
+	onSyncProducts,
+	isSyncing,
 }: {
 	store: ShopeeStore;
 	onDisconnect: (shopId: string) => void;
 	onRefreshToken: (shopId: string) => void;
+	onSyncProducts: (shopId: string) => void;
+	isSyncing: boolean;
 }) {
 	const status = statusConfig[store.status] || statusConfig.ERROR;
 	const isExpired = store.status === "TOKEN_EXPIRED";
+	const isActive = store.status === "ACTIVE";
 	const tokenExpiry = new Date(store.tokenExpiresAt);
-	const isExpiringSoon = tokenExpiry.getTime() - Date.now() < 24 * 60 * 60 * 1000; // 24h
+	const tokenInfo = getDaysUntil(tokenExpiry);
+	const lastSync = store.lastSyncAt ? new Date(store.lastSyncAt) : null;
 
 	return (
-		<div className="card shopee-store-card">
-			<div className="card-body">
-				<div className="shopee-store-header">
-					<div className="shopee-store-info">
-						<IconShopee size={32} className="shopee-icon" />
-						<div>
-							<h3 className="shopee-store-name">{store.shopName || `Loja ${store.shopId}`}</h3>
-							<span className="shopee-store-id">ID: {store.shopId}</span>
+		<div className={`shopee-card ${status.bgClass}`}>
+			{/* Header com gradiente laranja */}
+			<div className="shopee-card-header">
+				<div className="shopee-card-logo">
+					<IconShopee size={28} />
+				</div>
+				<div className="shopee-card-title">
+					<h3>{store.shopName || `Loja ${store.shopId}`}</h3>
+					<span className="shopee-card-id">ID: {store.shopId}</span>
+				</div>
+				<div className={`shopee-card-status ${status.bgClass}`}>
+					<span className="status-dot"></span>
+					{status.label}
+				</div>
+			</div>
+
+			{/* Corpo do card */}
+			<div className="shopee-card-body">
+				{/* Métricas principais */}
+				<div className="shopee-card-metrics">
+					<div className="shopee-metric">
+						<div className="shopee-metric-icon">
+							<IconMapPin size={16} />
+						</div>
+						<div className="shopee-metric-content">
+							<span className="shopee-metric-label">Região</span>
+							<span className="shopee-metric-value">{store.region || "BR"}</span>
 						</div>
 					</div>
-					<span className={`badge ${status.color}`}>
-						{status.icon}
-						{status.label}
+
+					<div
+						className={`shopee-metric ${
+							tokenInfo.isUrgent ? "urgent" : tokenInfo.isWarning ? "warning" : ""
+						}`}
+					>
+						<div className="shopee-metric-icon">
+							<IconCalendar size={16} />
+						</div>
+						<div className="shopee-metric-content">
+							<span className="shopee-metric-label">Token</span>
+							<span className="shopee-metric-value">{tokenInfo.label}</span>
+						</div>
+					</div>
+
+					<div className="shopee-metric">
+						<div className="shopee-metric-icon">
+							<IconClock size={16} />
+						</div>
+						<div className="shopee-metric-content">
+							<span className="shopee-metric-label">Última Sincronização</span>
+							<span className="shopee-metric-value">
+								{lastSync ? getRelativeTime(lastSync) : "Nunca"}
+							</span>
+						</div>
+					</div>
+				</div>
+
+				{/* Mensagem de erro se houver */}
+				{store.errorMessage && (
+					<div className="shopee-card-error">
+						<IconError size={16} />
+						<span>{store.errorMessage}</span>
+					</div>
+				)}
+
+				{/* Barra de progresso do token */}
+				<div className="shopee-token-progress">
+					<div className="shopee-token-bar">
+						<div
+							className={`shopee-token-fill ${
+								tokenInfo.isUrgent ? "urgent" : tokenInfo.isWarning ? "warning" : ""
+							}`}
+							style={{ width: `${Math.min(100, Math.max(0, (tokenInfo.days / 30) * 100))}%` }}
+						></div>
+					</div>
+					<span className="shopee-token-expiry">
+						Expira em {tokenExpiry.toLocaleDateString("pt-BR")} às{" "}
+						{tokenExpiry.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
 					</span>
 				</div>
+			</div>
 
-				<div className="shopee-store-details">
-					<div className="shopee-store-detail">
-						<span className="detail-label">Região</span>
-						<span className="detail-value">{store.region}</span>
-					</div>
-					<div className="shopee-store-detail">
-						<span className="detail-label">Token expira em</span>
-						<span className={`detail-value ${isExpiringSoon ? "text-warning" : ""}`}>
-							{tokenExpiry.toLocaleDateString("pt-BR")} às{" "}
-							{tokenExpiry.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-						</span>
-					</div>
-					{store.lastSyncAt && (
-						<div className="shopee-store-detail">
-							<span className="detail-label">Última sincronização</span>
-							<span className="detail-value">{new Date(store.lastSyncAt).toLocaleString("pt-BR")}</span>
-						</div>
-					)}
-					{store.errorMessage && (
-						<div className="shopee-store-detail error">
-							<span className="detail-label">Erro</span>
-							<span className="detail-value text-danger">{store.errorMessage}</span>
-						</div>
-					)}
-				</div>
-
-				<div className="shopee-store-actions">
-					{(isExpired || isExpiringSoon) && (
-						<button className="btn btn-sm btn-primary" onClick={() => onRefreshToken(store.shopId)}>
-							<IconRefresh size={16} />
-							Renovar Token
-						</button>
-					)}
-					<button className="btn btn-sm btn-danger-outline" onClick={() => onDisconnect(store.shopId)}>
-						<IconTrash size={16} />
-						Desconectar
+			{/* Ações */}
+			<div className="shopee-card-actions">
+				{isActive && (
+					<button
+						className="shopee-action-btn primary"
+						onClick={() => onSyncProducts(store.shopId)}
+						disabled={isSyncing}
+					>
+						{isSyncing ? (
+							<>
+								<IconRefresh size={18} className="spinning" />
+								<span>Sincronizando...</span>
+							</>
+						) : (
+							<>
+								<IconPackage size={18} />
+								<span>Sincronizar</span>
+							</>
+						)}
 					</button>
-				</div>
+				)}
+				{(isExpired || tokenInfo.isWarning || tokenInfo.isUrgent) && (
+					<button className="shopee-action-btn warning" onClick={() => onRefreshToken(store.shopId)}>
+						<IconRefresh size={18} />
+						<span>Renovar Token</span>
+					</button>
+				)}
+				<button className="shopee-action-btn danger" onClick={() => onDisconnect(store.shopId)}>
+					<IconTrash size={18} />
+				</button>
 			</div>
 		</div>
 	);
@@ -95,10 +214,13 @@ export function ShopeePage() {
 		disconnectStore,
 		refreshStoreToken,
 		refreshStores,
+		syncProducts,
 	} = useShopee();
 	const [isConnecting, setIsConnecting] = useState(false);
 	const [storeToDisconnect, setStoreToDisconnect] = useState<string | null>(null);
 	const [actionError, setActionError] = useState<string | null>(null);
+	const [syncingStoreId, setSyncingStoreId] = useState<string | null>(null);
+	const [syncResult, setSyncResult] = useState<ShopeeSyncProductsResult | null>(null);
 
 	const handleConnect = async () => {
 		setIsConnecting(true);
@@ -133,6 +255,20 @@ export function ShopeePage() {
 		}
 	};
 
+	const handleSyncProducts = async (shopId: string) => {
+		setSyncingStoreId(shopId);
+		setActionError(null);
+		setSyncResult(null);
+		try {
+			const result = await syncProducts(shopId);
+			setSyncResult(result);
+		} catch (err) {
+			setActionError(err instanceof Error ? err.message : "Erro ao sincronizar produtos");
+		} finally {
+			setSyncingStoreId(null);
+		}
+	};
+
 	if (isLoading) {
 		return (
 			<div className="page">
@@ -164,6 +300,33 @@ export function ShopeePage() {
 			</div>
 
 			{(error || actionError) && <ErrorMessage message={error || actionError || ""} />}
+
+			{/* Resultado da Sincronização */}
+			{syncResult && (
+				<div className="alert alert-success">
+					<IconCheck size={20} />
+					<div>
+						<strong>Sincronização concluída!</strong>
+						<p>
+							{syncResult.created} produtos criados, {syncResult.updated} atualizados,{" "}
+							{syncResult.deactivated} desativados
+						</p>
+						{syncResult.errors.length > 0 && (
+							<details>
+								<summary>{syncResult.errors.length} erro(s) encontrado(s)</summary>
+								<ul>
+									{syncResult.errors.map((err, i) => (
+										<li key={i}>{err}</li>
+									))}
+								</ul>
+							</details>
+						)}
+					</div>
+					<button className="btn btn-ghost btn-sm" onClick={() => setSyncResult(null)}>
+						✕
+					</button>
+				</div>
+			)}
 
 			{/* Stats */}
 			{connectionStatus && (
@@ -204,6 +367,8 @@ export function ShopeePage() {
 							store={store}
 							onDisconnect={setStoreToDisconnect}
 							onRefreshToken={handleRefreshToken}
+							onSyncProducts={handleSyncProducts}
+							isSyncing={syncingStoreId === store.shopId}
 						/>
 					))}
 				</div>

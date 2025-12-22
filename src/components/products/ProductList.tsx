@@ -5,7 +5,18 @@ import type { Product, ProductFilters } from "../../types";
 import { ProductCard } from "./ProductCard";
 import { ProductListView } from "./ProductListView";
 import { ProductFiltersComponent } from "./ProductFilters";
-import { ConfirmDialog, Loading, ErrorMessage, IconPlus, IconProducts, IconGrid, IconList, Pagination } from "../ui";
+import { SyncShopeeModal } from "./SyncShopeeModal";
+import {
+	ConfirmDialog,
+	Loading,
+	ErrorMessage,
+	IconPlus,
+	IconProducts,
+	IconGrid,
+	IconList,
+	Pagination,
+	IconShopee,
+} from "../ui";
 
 type ViewMode = "grid" | "list";
 
@@ -35,6 +46,7 @@ export function ProductList() {
 	const [badges, setBadges] = useState<string[]>([]);
 	const [deleteConfirm, setDeleteConfirm] = useState<Product | null>(null);
 	const [viewMode, setViewMode] = useState<ViewMode>("grid");
+	const [showSyncModal, setShowSyncModal] = useState(false);
 
 	// Carregar produtos
 	useEffect(() => {
@@ -97,6 +109,11 @@ export function ProductList() {
 		setFilters((prev) => ({ ...prev, page }));
 	};
 
+	const handleSyncComplete = () => {
+		// Recarregar produtos após sincronização
+		fetchProducts(filters);
+	};
+
 	return (
 		<div className="page">
 			{/* Header */}
@@ -124,6 +141,10 @@ export function ProductList() {
 							<IconList size={18} />
 						</button>
 					</div>
+					<button onClick={() => setShowSyncModal(true)} className="btn btn-secondary">
+						<IconShopee size={18} />
+						<span>Sincronizar Shopee</span>
+					</button>
 					<button onClick={handleCreate} className="btn btn-primary">
 						<IconPlus size={18} />
 						<span>Novo Produto</span>
@@ -192,6 +213,13 @@ export function ProductList() {
 				confirmLabel="Excluir"
 				onConfirm={handleDeleteConfirm}
 				onCancel={() => setDeleteConfirm(null)}
+			/>
+
+			{/* Modal de Sincronização Shopee */}
+			<SyncShopeeModal
+				isOpen={showSyncModal}
+				onClose={() => setShowSyncModal(false)}
+				onSyncComplete={handleSyncComplete}
 			/>
 		</div>
 	);

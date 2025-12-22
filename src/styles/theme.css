@@ -128,6 +128,15 @@
 	--z-sticky: 200;
 	--z-modal: 300;
 	--z-tooltip: 400;
+
+	/* Breakpoints (para referência, usados em @media queries) */
+	/* --bp-xs: 480px  - Mobile pequeno */
+	/* --bp-sm: 640px  - Mobile */
+	/* --bp-md: 768px  - Tablet */
+	/* --bp-lg: 1024px - Laptop */
+	/* --bp-xl: 1280px - Desktop */
+	/* --bp-2xl: 1440px - Desktop 2K */
+	/* --bp-3xl: 1920px - Full HD+ */
 }
 
 /* ========================================
@@ -280,6 +289,18 @@ p {
 
 .btn-success:hover:not(:disabled) {
 	background: var(--success-600);
+}
+
+/* Danger Outline Button */
+.btn-danger-outline {
+	background: transparent;
+	color: var(--error-500);
+	border: 1px solid var(--error-300);
+}
+
+.btn-danger-outline:hover:not(:disabled) {
+	background: var(--error-50);
+	border-color: var(--error-500);
 }
 
 /* Icon Button */
@@ -2829,7 +2850,86 @@ p {
    RESPONSIVE
    ======================================== */
 
-@media (max-width: 768px) {
+/* Large screens - 2K+ (1440px+) */
+@media (min-width: 1440px) {
+	.app-nav-inner {
+		padding: var(--space-4) var(--space-8);
+	}
+
+	.app-main {
+		padding: var(--space-8);
+	}
+
+	.cards-grid {
+		grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+		gap: var(--space-6);
+	}
+
+	.grid-auto-fill {
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	}
+
+	.stats-grid {
+		gap: var(--space-5);
+	}
+
+	.section-header {
+		margin-bottom: var(--space-6);
+	}
+
+	.modal {
+		max-width: 560px;
+	}
+
+	.modal-lg {
+		max-width: 800px;
+	}
+}
+
+/* Full HD+ (1920px+) */
+@media (min-width: 1920px) {
+	.cards-grid {
+		grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+	}
+
+	.todo-grid {
+		grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+	}
+}
+
+/* Laptop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+	.cards-grid {
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	}
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+	.app-main {
+		padding: var(--space-5);
+	}
+
+	.section-header {
+		flex-wrap: wrap;
+		gap: var(--space-3);
+	}
+
+	.todo-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.cards-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.stats-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* Mobile (até 767px) */
+@media (max-width: 767px) {
 	.app-nav-inner {
 		padding: var(--space-3) var(--space-4);
 		gap: var(--space-4);
@@ -4088,93 +4188,510 @@ p {
 	gap: var(--space-4);
 }
 
-/* Shopee Store Card */
-.shopee-store-card {
-	transition: box-shadow var(--transition-fast);
+/* Shopee Store Card - Modern Design */
+.shopee-card {
+	background: var(--bg-secondary);
+	border-radius: var(--radius-xl);
+	overflow: hidden;
+	box-shadow: var(--shadow-sm);
+	transition: all var(--transition-base);
+	border: 1px solid var(--border-light);
 }
 
-.shopee-store-card:hover {
-	box-shadow: var(--shadow-md);
+.shopee-card:hover {
+	box-shadow: var(--shadow-lg);
+	transform: translateY(-2px);
 }
 
-.shopee-store-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
-	margin-bottom: var(--space-4);
+/* Status-based border colors */
+.shopee-card.status-active {
+	border-top: 3px solid var(--success-500);
 }
 
-.shopee-store-info {
+.shopee-card.status-warning {
+	border-top: 3px solid var(--warning-500);
+}
+
+.shopee-card.status-error {
+	border-top: 3px solid var(--error-500);
+}
+
+.shopee-card.status-disconnected {
+	border-top: 3px solid var(--neutral-400);
+}
+
+/* Card Header */
+.shopee-card-header {
 	display: flex;
 	align-items: center;
 	gap: var(--space-3);
+	padding: var(--space-4);
+	background: linear-gradient(135deg, #ee4d2d 0%, #ff6633 100%);
+	color: white;
 }
 
-.shopee-store-name {
+.shopee-card-logo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: var(--radius-lg);
+	flex-shrink: 0;
+}
+
+.shopee-card-logo svg {
+	color: white;
+}
+
+.shopee-card-title {
+	flex: 1;
+	min-width: 0;
+}
+
+.shopee-card-title h3 {
+	margin: 0;
 	font-size: var(--text-lg);
 	font-weight: 600;
-	margin: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
-.shopee-store-id {
+.shopee-card-id {
+	font-size: var(--text-xs);
+	opacity: 0.85;
+}
+
+.shopee-card-status {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	padding: var(--space-1) var(--space-3);
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: var(--radius-full);
+	font-size: var(--text-xs);
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.shopee-card-status .status-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: white;
+	animation: pulse 2s infinite;
+}
+
+.shopee-card-status.status-active .status-dot {
+	background: #4ade80;
+	box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+}
+
+.shopee-card-status.status-warning .status-dot {
+	background: #fbbf24;
+	box-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+	animation: blink 1s infinite;
+}
+
+.shopee-card-status.status-error .status-dot,
+.shopee-card-status.status-disconnected .status-dot {
+	background: #f87171;
+	box-shadow: 0 0 8px rgba(248, 113, 113, 0.6);
+}
+
+@keyframes pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.7;
+	}
+}
+
+@keyframes blink {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.4;
+	}
+}
+
+/* Card Body */
+.shopee-card-body {
+	padding: var(--space-4);
+}
+
+/* Metrics Grid */
+.shopee-card-metrics {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--space-3);
+	margin-bottom: var(--space-4);
+}
+
+.shopee-metric {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--space-2);
+	padding: var(--space-3);
+	background: var(--bg-tertiary);
+	border-radius: var(--radius-md);
+	transition: all var(--transition-fast);
+}
+
+.shopee-metric.warning {
+	background: var(--warning-50);
+	border: 1px solid var(--warning-200);
+}
+
+.shopee-metric.urgent {
+	background: var(--error-50);
+	border: 1px solid var(--error-200);
+}
+
+.shopee-metric-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	background: var(--bg-secondary);
+	border-radius: var(--radius-md);
+	color: var(--text-secondary);
+	flex-shrink: 0;
+}
+
+.shopee-metric.warning .shopee-metric-icon {
+	background: var(--warning-100);
+	color: var(--warning-600);
+}
+
+.shopee-metric.urgent .shopee-metric-icon {
+	background: var(--error-100);
+	color: var(--error-600);
+}
+
+.shopee-metric-content {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.shopee-metric-label {
+	font-size: var(--text-xs);
+	color: var(--text-tertiary);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.shopee-metric-value {
+	font-size: var(--text-sm);
+	font-weight: 600;
+	color: var(--text-primary);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.shopee-metric.warning .shopee-metric-value {
+	color: var(--warning-700);
+}
+
+.shopee-metric.urgent .shopee-metric-value {
+	color: var(--error-600);
+}
+
+/* Error Message */
+.shopee-card-error {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--space-2);
+	padding: var(--space-3);
+	background: var(--error-50);
+	border: 1px solid var(--error-200);
+	border-radius: var(--radius-md);
+	margin-bottom: var(--space-4);
+	color: var(--error-700);
+	font-size: var(--text-sm);
+}
+
+.shopee-card-error svg {
+	flex-shrink: 0;
+	margin-top: 2px;
+}
+
+/* Token Progress Bar */
+.shopee-token-progress {
+	margin-bottom: var(--space-2);
+}
+
+.shopee-token-bar {
+	height: 6px;
+	background: var(--neutral-200);
+	border-radius: var(--radius-full);
+	overflow: hidden;
+	margin-bottom: var(--space-2);
+}
+
+.shopee-token-fill {
+	height: 100%;
+	background: linear-gradient(90deg, var(--success-400), var(--success-500));
+	border-radius: var(--radius-full);
+	transition: width 0.5s ease;
+}
+
+.shopee-token-fill.warning {
+	background: linear-gradient(90deg, var(--warning-400), var(--warning-500));
+}
+
+.shopee-token-fill.urgent {
+	background: linear-gradient(90deg, var(--error-400), var(--error-500));
+}
+
+.shopee-token-expiry {
 	font-size: var(--text-xs);
 	color: var(--text-tertiary);
 }
 
-.shopee-store-details {
+/* Card Actions */
+.shopee-card-actions {
 	display: flex;
-	flex-direction: column;
 	gap: var(--space-2);
-	margin-bottom: var(--space-4);
-	padding: var(--space-3);
-	background: var(--bg-tertiary);
-	border-radius: var(--radius-md);
+	padding: var(--space-4);
+	padding-top: 0;
 }
 
-.shopee-store-detail {
+.shopee-action-btn {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
-	font-size: var(--text-sm);
-}
-
-.detail-label {
-	color: var(--text-secondary);
-}
-
-.detail-value {
-	color: var(--text-primary);
-	font-weight: 500;
-}
-
-.detail-value.text-warning {
-	color: var(--warning-500);
-}
-
-.detail-value.text-danger {
-	color: var(--error-500);
-}
-
-.shopee-store-actions {
-	display: flex;
+	justify-content: center;
 	gap: var(--space-2);
-	justify-content: flex-end;
-}
-
-.btn-sm {
-	padding: var(--space-1) var(--space-3);
+	padding: var(--space-2) var(--space-4);
+	border: none;
+	border-radius: var(--radius-md);
 	font-size: var(--text-sm);
+	font-weight: 500;
+	cursor: pointer;
+	transition: all var(--transition-fast);
+	flex: 1;
 }
 
-.btn-danger-outline {
+.shopee-action-btn.primary {
+	background: linear-gradient(135deg, #ee4d2d 0%, #ff6633 100%);
+	color: white;
+}
+
+.shopee-action-btn.primary:hover:not(:disabled) {
+	background: linear-gradient(135deg, #d84527 0%, #ee5522 100%);
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(238, 77, 45, 0.3);
+}
+
+.shopee-action-btn.primary:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.shopee-action-btn.warning {
+	background: var(--warning-100);
+	color: var(--warning-700);
+	border: 1px solid var(--warning-300);
+}
+
+.shopee-action-btn.warning:hover {
+	background: var(--warning-200);
+}
+
+.shopee-action-btn.danger {
 	background: transparent;
 	color: var(--error-500);
-	border: 1px solid var(--error-300);
+	border: 1px solid var(--error-200);
+	flex: 0;
+	padding: var(--space-2);
 }
 
-.btn-danger-outline:hover:not(:disabled) {
+.shopee-action-btn.danger:hover {
 	background: var(--error-50);
-	border-color: var(--error-500);
+	border-color: var(--error-400);
+}
+
+/* Grid for multiple cards */
+.shopee-stores-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+	gap: var(--space-5);
+}
+
+/* Responsive - 2K+ screens (1440px+) */
+@media (min-width: 1440px) {
+	.shopee-stores-grid {
+		grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+		gap: var(--space-6);
+	}
+
+	.shopee-card {
+		border-radius: var(--radius-xl);
+	}
+
+	.shopee-card-header {
+		padding: var(--space-5);
+	}
+
+	.shopee-card-body {
+		padding: var(--space-5);
+	}
+
+	.shopee-card-metrics {
+		gap: var(--space-4);
+	}
+
+	.shopee-metric {
+		padding: var(--space-4);
+	}
+
+	.shopee-metric-icon {
+		width: 36px;
+		height: 36px;
+	}
+
+	.shopee-metric-value {
+		font-size: var(--text-base);
+	}
+
+	.shopee-card-actions {
+		padding: var(--space-5);
+		padding-top: 0;
+	}
+}
+
+/* Responsive - Large laptops (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+	.shopee-stores-grid {
+		grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+	}
+
+	.shopee-card-metrics {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.shopee-metric {
+		padding: var(--space-2);
+		gap: var(--space-1);
+	}
+
+	.shopee-metric-icon {
+		width: 28px;
+		height: 28px;
+	}
+
+	.shopee-metric-label {
+		font-size: 10px;
+	}
+
+	.shopee-metric-value {
+		font-size: var(--text-xs);
+	}
+}
+
+/* Responsive - Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+	.shopee-stores-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.shopee-card-metrics {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.shopee-metric {
+		padding: var(--space-2);
+		gap: var(--space-1);
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.shopee-metric-icon {
+		width: 32px;
+		height: 32px;
+	}
+
+	.shopee-metric-content {
+		align-items: center;
+	}
+
+	.shopee-metric-label {
+		font-size: 9px;
+	}
+
+	.shopee-metric-value {
+		font-size: 11px;
+	}
+}
+
+/* Responsive - Mobile (até 767px) */
+@media (max-width: 767px) {
+	.shopee-stores-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.shopee-card-header {
+		padding: var(--space-3);
+		gap: var(--space-2);
+	}
+
+	.shopee-card-logo {
+		width: 36px;
+		height: 36px;
+	}
+
+	.shopee-card-title h3 {
+		font-size: var(--text-base);
+	}
+
+	.shopee-card-body {
+		padding: var(--space-3);
+	}
+
+	.shopee-card-metrics {
+		grid-template-columns: 1fr;
+		gap: var(--space-2);
+	}
+
+	.shopee-metric {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.shopee-card-actions {
+		flex-wrap: wrap;
+		padding: var(--space-3);
+		padding-top: 0;
+	}
+
+	.shopee-action-btn {
+		flex: 1 1 calc(50% - var(--space-2));
+		padding: var(--space-2) var(--space-3);
+		font-size: var(--text-xs);
+	}
+
+	.shopee-action-btn span {
+		display: none;
+	}
+
+	.shopee-action-btn.danger {
+		flex: 0 0 auto;
+	}
+}
+
+/* Legacy classes - keep for compatibility */
+.shopee-store-card {
+	transition: box-shadow var(--transition-fast);
 }
 
 /* Empty State */
@@ -4331,26 +4848,65 @@ p {
 	justify-content: center;
 }
 
-@media (max-width: 768px) {
-	.shopee-stores-grid {
-		grid-template-columns: 1fr;
-	}
-
-	.shopee-stats {
-		grid-template-columns: 1fr;
+/* Responsive - Page layout for all screens */
+@media (min-width: 1440px) {
+	.page {
+		max-width: 1440px;
+		padding: var(--space-8);
 	}
 
 	.page-header {
+		margin-bottom: var(--space-8);
+	}
+
+	.page-title {
+		font-size: var(--text-3xl);
+	}
+
+	.shopee-stats {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+@media (min-width: 1920px) {
+	.page {
+		max-width: 1680px;
+	}
+}
+
+@media (max-width: 1023px) {
+	.page-header {
 		flex-direction: column;
+		align-items: flex-start;
 		gap: var(--space-4);
 	}
 
 	.page-actions {
 		width: 100%;
+		flex-wrap: wrap;
+	}
+
+	.page-actions .btn {
+		flex: 1 1 auto;
+		min-width: 120px;
+	}
+}
+
+@media (max-width: 767px) {
+	.shopee-stats {
+		grid-template-columns: 1fr;
 	}
 
 	.page-actions .btn {
 		flex: 1;
+	}
+
+	.callback-actions {
+		flex-direction: column;
+	}
+
+	.callback-actions .btn {
+		width: 100%;
 	}
 }
 
@@ -5274,5 +5830,105 @@ p {
 @media (max-width: 768px) {
 	.list-table {
 		min-width: 600px;
+	}
+}
+
+/* ========================================
+   SYNC SHOPEE MODAL
+   ======================================== */
+
+.sync-store-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}
+
+.sync-store-item {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	padding: var(--space-3);
+	background: var(--bg-tertiary);
+	border-radius: var(--radius-md);
+	cursor: pointer;
+	transition: all var(--transition-fast);
+}
+
+.sync-store-item:hover {
+	background: var(--neutral-100);
+}
+
+.sync-store-item.sync-store-all {
+	background: var(--primary-50);
+	border: 1px solid var(--primary-200);
+	font-weight: 500;
+}
+
+.sync-store-item.syncing {
+	background: var(--primary-50);
+	border: 1px solid var(--primary-300);
+}
+
+.sync-store-item.completed {
+	background: var(--success-50);
+	border: 1px solid var(--success-300);
+}
+
+.sync-store-item.error {
+	background: var(--error-50);
+	border: 1px solid var(--error-300);
+}
+
+.sync-store-item input[type="checkbox"] {
+	width: 18px;
+	height: 18px;
+	accent-color: var(--primary-500);
+}
+
+.sync-store-name {
+	flex: 1;
+}
+
+.sync-results-summary {
+	display: flex;
+	justify-content: center;
+	gap: var(--space-6);
+	margin-top: var(--space-4);
+}
+
+.sync-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: var(--space-3) var(--space-4);
+	background: var(--bg-tertiary);
+	border-radius: var(--radius-md);
+	min-width: 80px;
+}
+
+.sync-stat-value {
+	font-size: var(--text-2xl);
+	font-weight: 700;
+	color: var(--primary-600);
+}
+
+.sync-stat-label {
+	font-size: var(--text-xs);
+	color: var(--text-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+/* Spinning animation for sync icon */
+.spinning {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
 	}
 }
