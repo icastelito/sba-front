@@ -28,6 +28,7 @@ const DEMO_CONNECTION_STATUS: ShopeeConnectedResponse["data"] = {
 			shopId: DEMO_STORE.shopId,
 			shopName: DEMO_STORE.shopName || "Loja Teste SBA",
 			status: DEMO_STORE.status,
+			isActive: true,
 		},
 	],
 };
