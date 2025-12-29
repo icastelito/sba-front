@@ -23,7 +23,9 @@ export function LoginPage() {
 
 		try {
 			await login(formData);
-			navigate("/tarefas");
+			// Se for o auditor, vai direto para Shopee
+			const isAuditor = formData.login === "auditor@sba.dev" || formData.login === "auditor";
+			navigate(isAuditor ? "/shopee" : "/tarefas");
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Erro ao fazer login");
 		} finally {
@@ -71,45 +73,45 @@ export function LoginPage() {
 						<label htmlFor="password" className="form-label">
 							Senha
 						</label>
-				<div style={{ position: "relative" }}>
-					<input
-						type={showPassword ? "text" : "password"}
-						id="password"
-						className="form-input"
-						value={formData.password}
-						onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-						placeholder="••••••••"
-						required
-						autoComplete="current-password"
-						disabled={isSubmitting}
-						style={{ paddingRight: "2.5rem" }}
-					/>
-					<button
-						type="button"
-						onClick={() => setShowPassword(!showPassword)}
-						style={{
-							position: "absolute",
-							right: "0.5rem",
-							top: "50%",
-							transform: "translateY(-50%)",
-							background: "none",
-							border: "none",
-							cursor: "pointer",
-							padding: "0.25rem",
-							display: "flex",
-							alignItems: "center",
-							color: "var(--text-secondary)",
-						}}
-						disabled={isSubmitting}
-					>
-						{showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
-					</button>
-				</div>
-			</div>
+						<div style={{ position: "relative" }}>
+							<input
+								type={showPassword ? "text" : "password"}
+								id="password"
+								className="form-input"
+								value={formData.password}
+								onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+								placeholder="••••••••"
+								required
+								autoComplete="current-password"
+								disabled={isSubmitting}
+								style={{ paddingRight: "2.5rem" }}
+							/>
+							<button
+								type="button"
+								onClick={() => setShowPassword(!showPassword)}
+								style={{
+									position: "absolute",
+									right: "0.5rem",
+									top: "50%",
+									transform: "translateY(-50%)",
+									background: "none",
+									border: "none",
+									cursor: "pointer",
+									padding: "0.25rem",
+									display: "flex",
+									alignItems: "center",
+									color: "var(--text-secondary)",
+								}}
+								disabled={isSubmitting}
+							>
+								{showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+							</button>
+						</div>
+					</div>
 
-			<button type="submit" className="btn btn-primary auth-submit" disabled={isSubmitting}>
-				{isSubmitting ? "Entrando..." : "Entrar"}
-			</button>
+					<button type="submit" className="btn btn-primary auth-submit" disabled={isSubmitting}>
+						{isSubmitting ? "Entrando..." : "Entrar"}
+					</button>
 				</form>
 
 				<p className="auth-footer">

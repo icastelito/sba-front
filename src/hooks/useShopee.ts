@@ -1,12 +1,43 @@
 import { useState, useEffect, useCallback } from "react";
 import { shopeeApi } from "../lib/shopee";
+import { useAuth } from "./useAuth";
 import type { ShopeeStore, ShopeeConnectedResponse, ShopeeSyncProductsResult } from "../types";
+
+// Email do usuário de auditoria da Shopee
+const AUDITOR_EMAIL = "auditor@sba.dev";
+
+// Loja de demonstração para auditoria da Shopee
+const DEMO_STORE: ShopeeStore = {
+	id: "demo-001",
+	shopId: "SHOPEE-BR-DEMO",
+	shopName: "Loja Teste SBA",
+	region: "BR",
+	status: "ACTIVE",
+	tokenExpiresAt: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(), // 180 dias no futuro
+	lastSyncAt: new Date().toISOString(),
+	errorMessage: null,
+	createdAt: "2025-01-10T10:00:00Z",
+	updatedAt: new Date().toISOString(),
+};
+
+const DEMO_CONNECTION_STATUS: ShopeeConnectedResponse["data"] = {
+	totalStores: 1,
+	activeStores: 1,
+	stores: [
+		{
+			shopId: DEMO_STORE.shopId,
+			shopName: DEMO_STORE.shopName || "Loja Teste SBA",
+			status: DEMO_STORE.status,
+		},
+	],
+};
 
 interface UseShopeeReturn {
 	stores: ShopeeStore[];
 	connectionStatus: ShopeeConnectedResponse["data"] | null;
 	isLoading: boolean;
 	error: string | null;
+	isDemo: boolean;
 	connectStore: () => Promise<void>;
 	disconnectStore: (shopId: string) => Promise<void>;
 	refreshStoreToken: (shopId: string) => Promise<void>;
@@ -16,13 +47,26 @@ interface UseShopeeReturn {
 }
 
 export function useShopee(): UseShopeeReturn {
+	const { user } = useAuth();
 	const [stores, setStores] = useState<ShopeeStore[]>([]);
 	const [connectionStatus, setConnectionStatus] = useState<ShopeeConnectedResponse["data"] | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
+	// Modo demo só ativa para o usuário de auditoria
+	const isAuditor = user?.email === AUDITOR_EMAIL;
+	const isDemo = isAuditor;
+
 	// Carregar lojas conectadas
 	const loadStores = useCallback(async () => {
+		// Se for auditor, sempre mostra loja demo
+		if (isAuditor) {
+			setStores([DEMO_STORE]);
+			setConnectionStatus(DEMO_CONNECTION_STATUS);
+			setError(null);
+			return;
+		}
+
 		try {
 			const response = await shopeeApi.getStores();
 			if (response.success) {
@@ -31,10 +75,16 @@ export function useShopee(): UseShopeeReturn {
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Erro ao carregar lojas");
 		}
-	}, []);
+	}, [isAuditor]);
 
 	// Verificar status de conexão
 	const checkConnection = useCallback(async () => {
+		// Se for auditor, usa status demo
+		if (isAuditor) {
+			setConnectionStatus(DEMO_CONNECTION_STATUS);
+			return;
+		}
+
 		try {
 			const response = await shopeeApi.checkConnected();
 			if (response.success) {
@@ -43,7 +93,7 @@ export function useShopee(): UseShopeeReturn {
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Erro ao verificar conexão");
 		}
-	}, []);
+	}, [isAuditor]);
 
 	// Carregar dados iniciais
 	const loadData = useCallback(async () => {
@@ -79,6 +129,11 @@ export function useShopee(): UseShopeeReturn {
 	const disconnectStore = useCallback(
 		async (shopId: string) => {
 			setError(null);
+			// Em modo demo, apenas simula a desconexão
+			if (isDemo && shopId === DEMO_STORE.shopId) {
+				// Não faz nada - mantém a loja demo visível para auditoria
+				return;
+			}
 			try {
 				const response = await shopeeApi.disconnectStore(shopId);
 				if (response.success) {
@@ -89,13 +144,18 @@ export function useShopee(): UseShopeeReturn {
 				throw err;
 			}
 		},
-		[loadData]
+		[loadData, isDemo]
 	);
 
 	// Renovar token
 	const refreshStoreToken = useCallback(
 		async (shopId: string) => {
 			setError(null);
+			// Em modo demo, apenas simula a renovação
+			if (isDemo && shopId === DEMO_STORE.shopId) {
+				// Simula sucesso
+				return;
+			}
 			try {
 				const response = await shopeeApi.refreshStoreToken(shopId);
 				if (response.success) {
@@ -106,13 +166,24 @@ export function useShopee(): UseShopeeReturn {
 				throw err;
 			}
 		},
-		[loadStores]
+		[loadStores, isDemo]
 	);
 
 	// Sincronizar produtos da loja
 	const syncProducts = useCallback(
 		async (shopId: string): Promise<ShopeeSyncProductsResult> => {
 			setError(null);
+			// Em modo demo, retorna resultado simulado
+			if (isDemo && shopId === DEMO_STORE.shopId) {
+				// Simula uma sincronização bem-sucedida
+				await new Promise((resolve) => setTimeout(resolve, 1500)); // Delay para feedback visual
+				return {
+					created: 5,
+					updated: 12,
+					deactivated: 0,
+					errors: [],
+				};
+			}
 			try {
 				const response = await shopeeApi.syncProducts(shopId);
 				if (response.success) {
@@ -126,7 +197,7 @@ export function useShopee(): UseShopeeReturn {
 				throw err;
 			}
 		},
-		[loadStores]
+		[loadStores, isDemo]
 	);
 
 	return {
@@ -134,6 +205,7 @@ export function useShopee(): UseShopeeReturn {
 		connectionStatus,
 		isLoading,
 		error,
+		isDemo,
 		connectStore,
 		disconnectStore,
 		refreshStoreToken,
