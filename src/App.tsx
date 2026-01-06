@@ -29,6 +29,8 @@ import {
 	ProfilePage,
 	ShopeePage,
 	ShopeeCallbackPage,
+	IntegrationsPage,
+	AuditHelpPage,
 } from "./pages";
 
 function App() {
@@ -36,6 +38,9 @@ function App() {
 		<BrowserRouter>
 			<AuthProvider>
 				<Routes>
+					{/* Página de ajuda pública para auditoria Shopee */}
+					<Route path="/audit" element={<AuditHelpPage />} />
+
 					{/* Rotas públicas (só acessa se NÃO estiver logado) */}
 					<Route element={<PublicRoute />}>
 						<Route path="/login" element={<LoginPage />} />
@@ -50,7 +55,8 @@ function App() {
 					{/* Rotas protegidas (só acessa se estiver logado) */}
 					<Route element={<ProtectedRoute />}>
 						<Route path="/" element={<Layout />}>
-							<Route index element={<Navigate to="/shopee" replace />} />
+							<Route index element={<Navigate to="/integracoes" replace />} />
+							<Route path="integracoes" element={<IntegrationsPage />} />
 							<Route path="shopee" element={<ShopeePage />} />
 
 							{/* Tarefas */}

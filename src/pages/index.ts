@@ -17,3 +17,5 @@ export { RegisterPage } from "./RegisterPage";
 export { ProfilePage } from "./ProfilePage";
 export { ShopeePage } from "./ShopeePage";
 export { ShopeeCallbackPage } from "./ShopeeCallbackPage";
+export { IntegrationsPage } from "./IntegrationsPage";
+export { AuditHelpPage } from "./AuditHelpPage";

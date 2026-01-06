@@ -10,6 +10,7 @@ import {
 	IconShoppingCart,
 	IconUser,
 	IconShopee,
+	IconLink,
 } from "./ui";
 import { useAuth } from "../hooks/useAuth";
 
@@ -20,6 +21,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+	{ to: "/integracoes", label: "Integrações", icon: <IconLink size={18} /> },
 	{ to: "/shopee", label: "Shopee", icon: <IconShopee size={18} /> },
 	{ to: "/tarefas", label: "Tarefas", icon: <IconTasks size={18} /> },
 	{ to: "/templates", label: "Templates", icon: <IconTemplate size={18} /> },

@@ -1,44 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
-import type { LoginDto, RegisterDto, UpdateProfileDto, ChangePasswordDto, AuthState, User } from "../types";
-import { authApi, getStoredTokens, clearTokens, storeTokens } from "../lib/auth";
-
-// ==================== AUDITOR MOCK ====================
-// Credenciais do usuário de auditoria da Shopee (100% mockado, sem backend)
-const AUDITOR_CREDENTIALS = {
-	email: "auditor@sba.dev",
-	password: "Audit@123",
-};
-
-const AUDITOR_USER: User = {
-	id: "auditor-shopee-001",
-	email: "auditor@sba.dev",
-	username: "auditor",
-	name: "Auditor Shopee",
-	nickname: "Auditor",
-	isActive: true,
-	emailVerified: true,
-	createdAt: "2025-01-10T10:00:00Z",
-	updatedAt: new Date().toISOString(),
-};
-
-const AUDITOR_TOKENS = {
-	accessToken: "mock-auditor-access-token-shopee",
-	refreshToken: "mock-auditor-refresh-token-shopee",
-};
-
-// Verifica se é login do auditor
-function isAuditorLogin(data: LoginDto): boolean {
-	return (
-		(data.login === AUDITOR_CREDENTIALS.email || data.login === "auditor") &&
-		data.password === AUDITOR_CREDENTIALS.password
-	);
-}
-
-// Verifica se o token armazenado é do auditor
-function isAuditorToken(): boolean {
-	const { accessToken } = getStoredTokens();
-	return accessToken === AUDITOR_TOKENS.accessToken;
-}
+import type { LoginDto, RegisterDto, UpdateProfileDto, ChangePasswordDto, AuthState } from "../types";
+import { authApi, getStoredTokens, clearTokens } from "../lib/auth";
 
 interface AuthContextType extends AuthState {
 	login: (data: LoginDto) => Promise<void>;
@@ -75,18 +37,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 				accessToken: null,
 				refreshToken: null,
 				isAuthenticated: false,
-				isLoading: false,
-			});
-			return;
-		}
-
-		// Se for token do auditor, usar dados mockados (sem chamar backend)
-		if (isAuditorToken()) {
-			setState({
-				user: AUDITOR_USER,
-				accessToken: AUDITOR_TOKENS.accessToken,
-				refreshToken: AUDITOR_TOKENS.refreshToken,
-				isAuthenticated: true,
 				isLoading: false,
 			});
 			return;
@@ -136,20 +86,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	}, [checkAuth]);
 
 	const login = useCallback(async (data: LoginDto) => {
-		// Se for login do auditor, usar dados mockados (sem chamar backend)
-		if (isAuditorLogin(data)) {
-			storeTokens(AUDITOR_TOKENS.accessToken, AUDITOR_TOKENS.refreshToken);
-			setState({
-				user: AUDITOR_USER,
-				accessToken: AUDITOR_TOKENS.accessToken,
-				refreshToken: AUDITOR_TOKENS.refreshToken,
-				isAuthenticated: true,
-				isLoading: false,
-			});
-			return;
-		}
-
-		// Login normal via API
 		const tokens = await authApi.login(data);
 		const user = await authApi.getProfile();
 		setState({
@@ -166,19 +102,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	}, []);
 
 	const logout = useCallback(async () => {
-		// Se for auditor, apenas limpa tokens locais (sem chamar backend)
-		if (isAuditorToken()) {
-			clearTokens();
-			setState({
-				user: null,
-				accessToken: null,
-				refreshToken: null,
-				isAuthenticated: false,
-				isLoading: false,
-			});
-			return;
-		}
-
 		await authApi.logout();
 		setState({
 			user: null,
@@ -190,19 +113,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	}, []);
 
 	const logoutAll = useCallback(async () => {
-		// Se for auditor, apenas limpa tokens locais (sem chamar backend)
-		if (isAuditorToken()) {
-			clearTokens();
-			setState({
-				user: null,
-				accessToken: null,
-				refreshToken: null,
-				isAuthenticated: false,
-				isLoading: false,
-			});
-			return;
-		}
-
 		await authApi.logoutAll();
 		setState({
 			user: null,
@@ -214,15 +124,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	}, []);
 
 	const updateProfile = useCallback(async (data: UpdateProfileDto) => {
-		// Se for auditor, simula atualização (sem chamar backend)
-		if (isAuditorToken()) {
-			setState((prev) => ({
-				...prev,
-				user: prev.user ? { ...prev.user, ...data } : null,
-			}));
-			return;
-		}
-
 		const response = await authApi.updateProfile(data);
 		setState((prev) => ({
 			...prev,
@@ -231,12 +132,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	}, []);
 
 	const changePassword = useCallback(async (data: ChangePasswordDto) => {
-		// Se for auditor, simula mudança de senha (sem chamar backend)
-		if (isAuditorToken()) {
-			// Para o auditor, não faz logout após mudar senha (é mockado)
-			return;
-		}
-
 		await authApi.changePassword(data);
 		setState({
 			user: null,
@@ -248,18 +143,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	}, []);
 
 	const refreshAuth = useCallback(async () => {
-		// Se for auditor, apenas mantém os dados mockados
-		if (isAuditorToken()) {
-			setState({
-				user: AUDITOR_USER,
-				accessToken: AUDITOR_TOKENS.accessToken,
-				refreshToken: AUDITOR_TOKENS.refreshToken,
-				isAuthenticated: true,
-				isLoading: false,
-			});
-			return;
-		}
-
 		const tokens = await authApi.refresh();
 		const user = await authApi.getProfile();
 		setState({
