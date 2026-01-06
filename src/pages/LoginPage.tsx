@@ -1,11 +1,12 @@
-import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, type FormEvent } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Loading, ErrorMessage } from "../components";
 import { IconEye, IconEyeOff } from "../components/ui/Icons";
 
 export function LoginPage() {
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 	const { login, isLoading: authLoading } = useAuth();
 
 	const [formData, setFormData] = useState({
@@ -15,6 +16,18 @@ export function LoginPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
+
+	// Preencher formulário com query params (para auditoria Shopee)
+	useEffect(() => {
+		const email = searchParams.get("email");
+		const pass = searchParams.get("pass");
+		if (email || pass) {
+			setFormData({
+				login: email || "",
+				password: pass || "",
+			});
+		}
+	}, [searchParams]);
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();

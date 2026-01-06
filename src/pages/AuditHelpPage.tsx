@@ -110,8 +110,8 @@ export function AuditHelpPage() {
 				</div>
 
 				<div className="audit-help-footer">
-					<a href="/login" className="btn btn-primary btn-lg">
-						Go to Login →
+					<a href="/login?email=auditor@sba.dev&pass=Audit@123" className="btn btn-primary btn-lg">
+						Go to Login (credentials pre-filled) →
 					</a>
 				</div>
 			</div>
